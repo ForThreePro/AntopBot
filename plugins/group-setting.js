@@ -1,27 +1,44 @@
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-    let isClose = {
-        'abrir': 'not_announcement',
-        'cerrar': 'announcement',
-    }[(args[0] || '')]
+let handler = async (m, { conn, command }) => {
+    
+    let isClose
+    let estado
+    let icon
+    let react
 
-    if (isClose === undefined) {
-        await conn.reply(m.chat, `⚠️ Elija una opción.\n\n*${usedPrefix + command}* abrir\n*${usedPrefix + command}* cerrar`, m)
-        return
+    if (command === 'abrir') {
+        isClose = 'not_announcement'
+        estado = 'ABIERTO 🔓'
+        icon = '✅'
+        react = '🔓'
+    } 
+    if (command === 'cerrar') {
+        isClose = 'announcement'
+        estado = 'CERRADO 🔒'
+        icon = '🚫'
+        react = '🔒'
     }
 
     await conn.groupSettingUpdate(m.chat, isClose)
+    await m.react(react)
 
-    // Aviso de la acción realizada
-    let estado = isClose === 'announcement' ? 'cerrado 🔒' : 'abierto 🔓'
-    await conn.reply(m.chat, `🛸 *Grupo actualmente ${estado}*\n> Por: @${m.sender.split('@')[0]}`, m, {
+    await conn.reply(m.chat, `🐉 𓆩 𝗚𝗥𝗨𝗣𝗢 ${estado} 𓆪 🐉
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ACCION REALIZADA\`\` —˙𖦹.🏆꒷
+
+${icon} *Estado:* El grupo fue ${estado.toLowerCase()}
+👑 *Por:* @${m.sender.split('@')[0]}
+
+━━━━━━━━━━━
+*Powered by*: SON GOKU PREM 💥`, m, {
         mentions: [m.sender]
     })
 }
 
-handler.help = ['grupo abrir', 'grupo cerrar']
+handler.help = ['abrir', 'cerrar']
 handler.tags = ['grupos']
-handler.command = ['group', 'grupo'] 
+handler.command = ['abrir', 'cerrar']
 handler.admin = true
 handler.botAdmin = true
+handler.group = true
 
 export default handler
