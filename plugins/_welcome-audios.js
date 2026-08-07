@@ -2,19 +2,24 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
   let chat = global.db.data.chats[m.chat]
   if (!chat) global.db.data.chats[m.chat] = {}
 
-  let type = command.replace('setaudio', '').replace('delaudio', '')
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
 
+  // Detectar tipo: welcome / bye / kick
+  let type = command.replace('audiowelcome','').replace('audiobye','').replace('audiokick','')
+                 .replace('delaudiowelcome','').replace('delaudiobye','').replace('delaudiokick','')
+
+  if (command.includes('welcome')) type = 'welcome'
+  if (command.includes('bye')) type = 'bye'
+  if (command.includes('kick')) type = 'kick'
+
   // SET AUDIO
-  if (command.startsWith('setaudio')) {
+  if (command.startsWith('audio')) {
     // Si responde a un audio o manda audio
     if (mime && /audio/.test(mime)) {
       let buffer = await q.download()
-      let fileName = `audio${type}_${m.chat}.mp3`
-      await conn.sendMessage(m.chat, { audio: buffer, fileName, mimetype: 'audio/mpeg' }, { quoted: m })
       chat[`audio${type}`] = buffer
-      return m.reply(`🐉 𓆩 𝗔𝗨𝗗𝗜𝗢 𝗚𝗨𝗔𝗥𝗗𝗔𝗗𝗢 𓆪 🐉\n\n✅ *Audio de ${type} guardado*\nResponde a un audio para cambiarlo`)
+      return m.reply(`🐉 𓆩 𝗔𝗨𝗗𝗜𝗢 𝗚𝗨𝗔𝗥𝗗𝗔𝗗𝗢 𓆪 🐉\n\n✅ *Audio de ${type} guardado*\nSe reproducirá cuando pase el evento`)
     }
 
     // Si manda un link
@@ -32,13 +37,13 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       return m.reply(`⚠️ *No hay un audio de ${type} configurado*`)
     }
     delete chat[`audio${type}`]
-    await m.reply(`🐉 𓆩 𝗔𝗨𝗗𝗜𝗢 𝗘𝗟𝗜𝗠𝗜𝗡𝗔𝗗𝗢 𓆪 🐉\n\n❌ *Audio de ${type} eliminado*\nYa no se enviará audio al ${type}`)
+    await m.reply(`🐉 𓆩 𝗔𝗨𝗗𝗜𝗢 𝗘𝗟𝗜𝗠𝗜𝗡𝗔𝗗𝗢 𓆪 🐉\n\n❌ *Audio de ${type} eliminado*`)
   }
 }
 
 handler.help = ['audiowelcome', 'audiobye', 'audiokick', 'delaudiowelcome', 'delaudiobye', 'delaudiokick']
 handler.tags = ['config']
-handler.command = /^(setaudio|delaudio)(welcome|bye|kick)$/i
+handler.command = /^(audio(welcome|bye|kick)|delaudio(welcome|bye|kick))$/i
 handler.group = true
 handler.admin = true
 
