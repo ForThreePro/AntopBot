@@ -48,58 +48,40 @@ handler.before = async function (m, { conn, groupMetadata }) {
     const groupDesc = groupMetadata.desc || 'Sin descripción'
     const membersCount = groupMetadata.participants.length
 
-    let txt = '', audio = null, type = ''
+    let txt = '', audio = null
 
     switch (m.messageStubType) {
       case WAMessageStubType.GROUP_PARTICIPANT_ADD:
-        type = 'welcome'
         audio = chat.audiowelcome
-        txt = chat.customWelcome?
-          chat.customWelcome.replace(/@user/gi, userTag).replace(/@group/gi, groupName).replace(/@desc/gi, groupDesc) :
-`🐉 𓆩 𝗡𝗨𝗘𝗩𝗢 𝗚𝗨𝗘𝗥𝗘𝗥𝗢 𓆪 🐉
-
-⚡ *${userTag}* se unió a *${groupName}*
-📊 *Miembro N°:* ${membersCount}
-> *Portate bien o te mando con Kamisama* 😏`
+        txt = chat.customWelcome? chat.customWelcome.replace(/@user/gi, userTag).replace(/@group/gi, groupName).replace(/@desc/gi, groupDesc) :
+`🐉 𓆩 𝗡𝗨𝗘𝗩𝗢 𝗚𝗨𝗘𝗥𝗘𝗥𝗢 𓆪 🐉\n\n⚡ *${userTag}* se unió a *${groupName}*\n📊 *Miembro N°:* ${membersCount}`
         break
 
       case WAMessageStubType.GROUP_PARTICIPANT_LEAVE:
-        type = 'bye'
         audio = chat.audiobye
-        txt = chat.customBye?
-          chat.customBye.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
-`🐉 𓆩 𝗦𝗘 𝗙𝗨𝗘 𓆪 🐉
-
-🏃‍♂️ *${userTag}* abandonó *${groupName}*
-📉 *Quedamos:* ${membersCount} guerreros`
+        txt = chat.customBye? chat.customBye.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
+`🐉 𓆩 𝗦𝗘 𝗙𝗨𝗘 𓆪 🐉\n\n🏃‍♂️ *${userTag}* abandonó *${groupName}*\n📉 *Quedamos:* ${membersCount}`
         break
 
       case WAMessageStubType.GROUP_PARTICIPANT_REMOVE:
-        type = 'kick'
         audio = chat.audiokick
-        txt = chat.customKick?
-          chat.customKick.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
-`🐉 𓆩 𝗘𝗫𝗣𝗨𝗟𝗦𝗔𝗗𝗢 𓆪 🐉
-
-⚡ *${userTag}* fue eliminado de *${groupName}*
-🚮 *Causa:* Rompió las reglas`
+        txt = chat.customKick? chat.customKick.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
+`🐉 𓆩 𝗘𝗫𝗣𝗨𝗟𝗦𝗔𝗗𝗢 𓆪 🐉\n\n⚡ *${userTag}* fue eliminado de *${groupName}*`
         break
     }
 
     if (txt) {
-      // 1. Manda imagen + texto
       await conn.sendMessage(m.chat, {
         image: typeof pp === 'string'? { url: pp } : pp,
         caption: txt,
         mentions: [userJid]
       })
 
-      // 2. Si hay audio configurado lo manda
       if (audio) {
         if (Buffer.isBuffer(audio)) {
-          await conn.sendMessage(m.chat, { audio: audio, mimetype: 'audio/mpeg', ptt: true }, { quoted: m })
+          await conn.sendMessage(m.chat, { audio: audio, mimetype: 'audio/mpeg', ptt: false }, { quoted: m })
         } else if (typeof audio === 'string' && audio.startsWith('http')) {
-          await conn.sendMessage(m.chat, { audio: { url: audio }, mimetype: 'audio/mpeg', ptt: true }, { quoted: m })
+          await conn.sendMessage(m.chat, { audio: { url: audio }, mimetype: 'audio/mpeg', ptt: false }, { quoted: m })
         }
       }
     }
