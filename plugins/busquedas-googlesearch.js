@@ -1,26 +1,40 @@
 import ytSearch from 'yt-search'
 
 let handler = async (m, { conn, text }) => {
-    if (!text) return m.reply('✨ *Nox Bot 🌃*\n¿Qué quieres buscar?')
-    
+    if (!text) return m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉\n\n✨ *¿Qué quieres buscar?*\n📌 *Ejemplo:* ${m.prefix}google Goku ultra instinto`)
+
     await m.react('🔍')
-    
+
     try {
         let search = await ytSearch(text)
         let results = search.videos.slice(0, 5)
-        
-        if (!results.length) return m.reply('❌ No encontré resultados.')
 
-        let txt = `*Nox Bot 🌃 - Buscador*\n`
-        txt += `_Consultando: ${text}_\n\n`
-        
-        txt += results.map((v, i) => {
-            return `*${i + 1}. ${v.title}*\n🕒 Duración: ${v.timestamp}\n🔗 ${v.url}`
-        }).join('\n\n')
+        if (!results.length) {
+            await m.react('❌')
+            return m.reply('⚠️ *No encontré resultados.*')
+        }
+
+        let txt = `🐉 𓆩 𝗕𝗨𝗦𝗖𝗔𝗗𝗢𝗥 𝗚𝗢𝗞𝗨 𓆪 🐉
+
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADOS\`\` —˙𖦹.🏆꒷
+
+🔎 *Buscando:* ${text}
+
+${results.map((v, i) => {
+            return `*${i + 1}.* *${v.title}*
+🕒 *Duración:* ${v.timestamp}
+👁️ *Vistas:* ${v.views}
+👤 *Canal:* ${v.author.name}
+🔗 ${v.url}`
+        }).join('\n\n')}
+
+━━━━━━━━━━━━━━
+*Powered by*: SON GOKU PREM 💥
+*Tip:* Usa .ytmp4 o .ytmp3 + el link`
 
         await conn.reply(m.chat, txt, m)
         await m.react('✅')
-        
+
     } catch (e) {
         console.error(e)
         await m.react('❌')
