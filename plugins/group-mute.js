@@ -1,38 +1,58 @@
-let mutedUsers = new Set();
+let mutedUsers = new Set()
 
 let handler = async (m, { conn, command, participants }) => {
-    let mentionedJid = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false;
-    if (!mentionedJid) return m.reply(`🛸 *[ NOX BOT MD ]* 🌌\n\n🚩 Etiqueta a una persona o responde a un mensaje.`);
-    
-    let isUserAdmin = participants.find(p => p.id === mentionedJid)?.admin;
-    if (isUserAdmin) return m.reply(`⚠️ *No puedes mutear a un administrador.*`);
-    if (mentionedJid === conn.user.jid) return m.reply(`⚠️ *No puedo realizar esta acción conmigo mismo.*`);
+    let mentionedJid = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
+    if (!mentionedJid) return m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+
+*Uso:*
+.mute @user → Para mutear
+.unmute @user → Para desmutear
+
+> *Etiqueta a una persona o responde a un mensaje*`)
+
+    let isUserAdmin = participants.find(p => p.id === mentionedJid)?.admin
+    if (isUserAdmin) return m.reply(`⚠️ *No puedes mutear a un administrador.*`)
+    if (mentionedJid === conn.user.jid) return m.reply(`⚠️ *No puedo mutearme a mi mismo.*`)
 
     if (command === "mute") {
-        mutedUsers.add(mentionedJid);
-        conn.reply(m.chat, `✅ *Usuario muteado:* @${mentionedJid.split('@')[0]}`, m, { mentions: [mentionedJid] });
-    } else if (command === "unmute") {
-        mutedUsers.delete(mentionedJid);
-        conn.reply(m.chat, `✅ *Usuario desmuteado:* @${mentionedJid.split('@')[0]}`, m, { mentions: [mentionedJid] });
-    }
-};
+        if (mutedUsers.has(mentionedJid)) return m.reply(`📛 *Este usuario ya está muteado*`)
+        mutedUsers.add(mentionedJid)
+        await m.react('🔇')
+        conn.reply(m.chat, `🐉 𓆩 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗠𝗨𝗧𝗘𝗔𝗗𝗢 𓆪 🐉
 
-handler.before = async (m, { conn, isAdmin }) => {
+🔇 *Usuario:* @${mentionedJid.split('@')[0]}
+👑 *Por:* @${m.sender.split('@')[0]}
+
+> *Sus mensajes serán eliminados automaticamente*`, m, { mentions: [mentionedJid, m.sender] })
+    } else if (command === "unmute") {
+        if (!mutedUsers.has(mentionedJid)) return m.reply(`✅ *Este usuario no está muteado*`)
+        mutedUsers.delete(mentionedJid)
+        await m.react('🔊')
+        conn.reply(m.chat, `🐉 𓆩 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗗𝗘𝗦𝗠𝗨𝗧𝗘𝗔𝗗𝗢 𓆪 🐉
+
+🔊 *Usuario:* @${mentionedJid.split('@')[0]}
+👑 *Por:* @${m.sender.split('@')[0]}
+
+> *Ya puede volver a escribir*`, m, { mentions: [mentionedJid, m.sender] })
+    }
+}
+
+handler.before = async (m, { conn }) => {
     // Si el remitente del mensaje está en la lista de muteados, eliminamos el mensaje
     if (mutedUsers.has(m.sender)) {
         try {
-            await conn.sendMessage(m.chat, { delete: m.key });
+            await conn.sendMessage(m.chat, { delete: m.key })
         } catch (e) {
-            console.error(e);
+            console.error(e)
         }
     }
-};
+}
 
-handler.help = ['mute', 'unmute'].map(v => v + ' @user');
-handler.tags = ['grupos'];
-handler.command = /^(mute|unmute)$/i;
-handler.group = true;
-handler.admin = true;
-handler.botAdmin = true;
+handler.help = ['mute @user', 'unmute @user']
+handler.tags = ['grupos']
+handler.command = /^(mute|unmute)$/i
+handler.group = true
+handler.admin = true
+handler.botAdmin = true
 
-export default handler;
+export default handler
