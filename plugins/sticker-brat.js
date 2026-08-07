@@ -60,7 +60,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   await m.react('✅')
 }
 
-handler.help = ['brat <texto>',<texto>']
+handler.help = ['brat <texto>']
 handler.tags = ['sticker']
 handler.command = /^brat?$/i
 
