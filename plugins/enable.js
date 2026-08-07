@@ -7,47 +7,53 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
   let bot = global.db.data.settings[conn.user.jid] || {}
   let type = command.toLowerCase()
 
-  if (!args[0]) return m.reply(`🛸 *[ BOX BOT MD ]* 🌌\n\n⚙️ *Configuración incorrecta.*\n📌 Uso: *${usedPrefix + command} on* o *${usedPrefix + command} off*`)
+  if (!args[0]) return m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+
+⚙️ *Configuración incorrecta*
+📌 *Uso:* ${usedPrefix + command} on
+📌 *Uso:* ${usedPrefix + command} off
+
+*Ejemplo:* ${usedPrefix + command} on`)
 
   let fail = false
   switch (type) {
     case 'welcome': case 'bienvenida':
-      if (m.isGroup && !isAdmin) { global.dfail('admin', m, conn); fail = true; break }
+      if (m.isGroup &&!isAdmin) { return conn.reply(m.chat, `❌ *Solo admins*`, m); fail = true; break }
       chat.bienvenida = isEnable
       break
     case 'subbots': case 'serbot':
-      if (!isROwner) { global.dfail('rowner', m, conn); fail = true; break }
+      if (!isROwner) { return conn.reply(m.chat, `❌ *Solo Owner*`, m); fail = true; break }
       bot.jadibotmd = isEnable
       break
     case 'antispam':
-      if (!isOwner) { global.dfail('owner', m, conn); fail = true; break }
+      if (!isOwner) { return conn.reply(m.chat, `❌ *Solo Owner*`, m); fail = true; break }
       bot.antiSpam = isEnable
       break
     case 'antilink':
-      if (m.isGroup && !isAdmin) { global.dfail('admin', m, conn); fail = true; break }
+      if (m.isGroup &&!isAdmin) { return conn.reply(m.chat, `❌ *Solo admins*`, m); fail = true; break }
       chat.antiLink = isEnable
       break
     case 'antibot':
-      if (m.isGroup && !isAdmin) { global.dfail('admin', m, conn); fail = true; break }
+      if (m.isGroup &&!isAdmin) { return conn.reply(m.chat, `❌ *Solo admins*`, m); fail = true; break }
       chat.antiBot = isEnable
       break
     case 'modoadmin':
-      if (m.isGroup && !isAdmin) { global.dfail('admin', m, conn); fail = true; break }
+      if (m.isGroup &&!isAdmin) { return conn.reply(m.chat, `❌ *Solo admins*`, m); fail = true; break }
       chat.modoadmin = isEnable
       break
     case 'nsfw': case 'antinopor':
-      if (m.isGroup && !isAdmin) { global.dfail('admin', m, conn); fail = true; break }
+      if (m.isGroup &&!isAdmin) { return conn.reply(m.chat, `❌ *Solo admins*`, m); fail = true; break }
       chat.nsfw = isEnable
       break
     case 'audios':
       chat.audios = isEnable
       break
     case 'autoread': case 'autoleer':
-      if (!isROwner) { global.dfail('rowner', m, conn); fail = true; break }
+      if (!isROwner) { return conn.reply(m.chat, `❌ *Solo Owner*`, m); fail = true; break }
       global.opts['autoread'] = isEnable
       break
     case 'antiprivado':
-      if (!isOwner) { global.dfail('owner', m, conn); fail = true; break }
+      if (!isOwner) { return conn.reply(m.chat, `❌ *Solo Owner*`, m); fail = true; break }
       bot.antiPrivate = isEnable
       break
     default:
@@ -64,22 +70,29 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
     catalogoImg = { url: 'https://files.catbox.moe/t7uytz.png' }
   }
 
-  let estadoTexto = isEnable ? 'Activado 🌀' : 'Desactivado ✖️'
+  let estadoTexto = isEnable? 'Activado 🌀' : 'Desactivado ✖️'
+  let estadoEmoji = isEnable? '🟢' : '🔴'
 
-  let statusTxt = `🛸 *[ NOX BOT MD ]* 🌌\n\n`
-  statusTxt += `⚙️ *Función:* ${type}\n`
-  statusTxt += `📊 *Estado:* ${estadoTexto}\n\n`
-  statusTxt += `⚙️ *Nox Bot MD• Sistema Automatizado* 🌀`
+  let statusTxt = `🐉 𓆩 𝗖𝗢𝗡𝗙𝗜𝗚𝗨𝗥𝗔𝗖𝗜𝗢𝗡 𓆪 🐉
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ON/OFF\`\` —˙𖦹.🏆꒷
+
+⚙️ *Función:* ${type}
+📊 *Estado:* ${estadoTexto} ${estadoEmoji}
+👑 *Por:* @${m.sender.split('@')[0]}
+
+━━━━━━━━━━━
+*Powered by*: SON GOKU PREM 💥`
 
   await conn.sendMessage(m.chat, {
-    image: catalogoImg.byteLength ? catalogoImg : { url: catalogoImg.url },
+    image: catalogoImg.byteLength? catalogoImg : { url: catalogoImg.url },
     caption: statusTxt,
     mentions: [m.sender]
   }, { quoted: m })
 }
 
-handler.help = ['welcome','antilag', 'antilink', 'antibot', 'modoadmin', 'subbots', 'nsfw', 'audios', 'antiprivado'].map(v => v + ' on/off')
+handler.help = ['welcome','antilink', 'antibot', 'modoadmin', 'subbots', 'nsfw', 'audios', 'antiprivado', 'antispam', 'autoread'].map(v => v + ' on/off')
 handler.tags = ['config']
-handler.command = ['welcome', 'antilag', 'bienvenida', 'subbots', 'serbot', 'antispam', 'antilink', 'antibot', 'modoadmin', 'nsfw', 'antinopor', 'audios', 'autoleer', 'autoread', 'antiprivado']
+handler.command = ['welcome', 'bienvenida', 'subbots', 'serbot', 'antispam', 'antilink', 'antibot', 'modoadmin', 'nsfw', 'antinopor', 'audios', 'autoleer', 'autoread', 'antiprivado']
 
 export default handler
