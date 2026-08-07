@@ -1,7 +1,11 @@
 import fs from 'fs'
 import os from 'os'
+import * as googleTTS from 'google-tts-api'
+import ffmpeg from 'fluent-ffmpeg'
+import path from 'path'
+import { tmpdir } from 'os'
 
-let handler = async (m, { command }) => {
+let handler = async (m, { conn, command, text, usedPrefix }) => {
     await m.react('⏳')
 
     if (command === 'cleartmp') {
@@ -26,6 +30,7 @@ let handler = async (m, { command }) => {
 ━━━━━━━━━━━
 *Owner*: @whois.yallico
 > *"He purificado los restos del entrenamiento"* 💥`
+        await m.react('✅')
         return m.reply(texto)
     }
 
@@ -47,6 +52,7 @@ let handler = async (m, { command }) => {
 ━━━━━━━━━━━
 *Owner*: @whois.yallico
 > *"Mi ki se está enfocando al ${cpu}%"* 💥`
+        await m.react('✅')
         return m.reply(texto)
     }
 
@@ -69,6 +75,7 @@ let handler = async (m, { command }) => {
 ━━━━━━━━━━━
 *Owner*: @whois.yallico
 > *"Tengo suficiente energía para seguir"* 💥`
+        await m.react('✅')
         return m.reply(texto)
     }
 
@@ -91,6 +98,7 @@ let handler = async (m, { command }) => {
 ━━━━━━━━━━━
 *Owner*: @whois.yallico
 > *"Llevo entrenando ${uptime} sin parar"* 💥`
+        await m.react('✅')
         return m.reply(texto)
     }
 
@@ -120,7 +128,90 @@ let handler = async (m, { command }) => {
 ━━━━━━━━━━━
 *Owner*: @whois.yallico
 > *"Todos mis sistemas están al 100%"* 💥`
+        await m.react('✅')
         return m.reply(texto)
+    }
+
+    if (command === 'tts' || command === 'gtts' || command === 'ttss') {
+        let q = m.quoted? m.quoted : m
+        let txt = text || q.text || q.caption || q.body || ''
+
+        if (!txt) {
+            let texto = `
+🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+
+.⃟𖥔 ݁. 𖦹˙— \`\`𝐄𝐑𝐎𝐑\`\` —˙𖦹.🏆꒷
+
+ ⤷ ┇ 𝗙𝗔𝗟𝗧𝗔 𝗧𝗘𝗫𝗧𝗢 ：✿ 。
+
+──愛 *𝗨𝗦𝗢* ╏ 🔥
+🔥 ➛ Escribe el texto que deseas convertir a audio
+🔥 ➛ O responde a un mensaje
+
+──愛 *𝗘𝗝𝗘𝗠𝗣𝗟𝗢* ╏ 🌌
+🌌 ➛ ${usedPrefix}tts Hola, ¿cómo estás?
+
+━━━━━━━━━━━
+*Owner*: @whois.yallico
+> *"Necesito escuchar tus palabras guerrero"* 💥`
+            await m.react('❌')
+            return m.reply(texto)
+        }
+
+        await m.react('🎙️')
+
+        let lang = 'es'
+        let url = googleTTS.getAudioUrl(txt, {
+            lang: lang,
+            slow: false,
+            host: 'https://translate.google.com',
+            timeout: 10000,
+        })
+
+        let tmpFilePath = path.join(tmpdir(), `${Date.now()}.opus`)
+
+        await new Promise((resolve, reject) => {
+            ffmpeg(url)
+               .audioCodec('libopus')
+               .toFormat('opus')
+               .outputOptions([
+                    '-avoid_negative_ts make_zero',
+                    '-ac 1',
+                    '-b:a 64k'
+                ])
+               .on('end', () => resolve(true))
+               .on('error', (err) => reject(err))
+               .save(tmpFilePath)
+        })
+
+        let audioBuffer = fs.readFileSync(tmpFilePath)
+
+        let caption = `
+🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+
+.⃟𖥔 ݁. 𖦹˙— \`\`𝐓𝐄𝐗𝐓 𝐓𝐎 𝐒𝐏𝐄𝐂𝐇\`\` —˙𖦹.🏆꒷
+
+ ⤷ ┇ 𝗔𝗨𝗗𝗜𝗢 𝗚𝗘𝗡𝗘𝗥𝗔𝗗𝗢 ：✿ 。
+
+──愛 *𝗜𝗡𝗙𝗢* ╏ 🔥
+🔥 ➛ Idioma: Español
+🔥 ➛ Voz: Google TTS
+
+──愛 *𝗧𝗘𝗫𝗧𝗢* ╏ 🌌
+🌌 ➛ "${txt}"
+
+━━━━━━━━━━━
+*Owner*: @whois.yallico
+> *"He convertido tu ki en sonido"* 💥`
+
+        await conn.sendMessage(m.chat, {
+            audio: audioBuffer,
+            mimetype: 'audio/ogg; codecs=opus',
+            ptt: true
+        }, { quoted: m })
+
+        if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath)
+        await m.react('✅')
     }
 }
 
@@ -132,9 +223,9 @@ function clockString(ms) {
     return `${d}d ${h}h ${m}m ${s}s`
 }
 
-handler.help = ['cleartmp', 'cpu', 'ram', 'uptime', 'info']
-handler.tags = ['main']
-handler.command = /^(cleartmp|cpu|ram|uptime|info)$/i
+handler.help = ['cleartmp', 'cpu', 'ram', 'uptime', 'info', 'tts <texto>']
+handler.tags = ['main', 'tools']
+handler.command = /^(cleartmp|cpu|ram|uptime|info|g?tts|ttss)$/i
 handler.rowner = true
 
 export default handler
