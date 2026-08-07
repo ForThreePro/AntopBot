@@ -1,11 +1,10 @@
 import { addExif, sticker } from '../lib/sticker.js'
 import axios from 'axios'
-import fetch from 'node-fetch'
 
 let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     await m.react('⏳')
 
-    // 1. WM / TAKE / ROBAR - SIN MARCA
+    // 1. WM / TAKE / ROBAR
     if (command === 'wm' || command === 'take' || command === 'robar') {
         if (!m.quoted) return error('Responde a un *Sticker*')
         let [packname,...author] = text.split('|')
@@ -26,7 +25,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         }
     }
 
-    // 2. S / STICKER / STIKER - SIN MARCA
+    // 2. S / STICKER / STIKER
     if (command === 's' || command === 'sticker' || command === 'stiker') {
         let q = m.quoted? m.quoted : m
         let mime = (q.msg || q).mimetype || q.mediaType || ''
@@ -37,12 +36,12 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         await m.react('✅')
     }
 
-    // 3. QC / QUOTLY - AHORA TAMBIEN SIN MARCA
+    // 3. QC / QUOTLY - ARREGLADO
     if (command === 'qc' || command === 'quotly') {
         let mentionedJid = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : null
         let authorName, txt, pp
 
-        if (!args.length &&!(m.quoted && m.quoted.text)) return error('Ingresa un texto para el sticker quotly')
+        if (!args.length &&!(m.quoted && m.quoted.text)) return error('Ingresa un texto para el sticker quotly\n> Ejemplo:.qc Hola mundo\n> Ejemplo:.qc @user Nombre / Texto\n> Ejemplo:.qc Nombre / Texto')
 
         if (mentionedJid && args.join(" ").includes("/")) {
             const joined = args.slice(1).join(" ")
@@ -58,11 +57,19 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
             pp = "https://files.catbox.moe/dpeqsr.jpg"
         } else if (!mentionedJid && args.length >= 1) {
             txt = args.join(" ")
-            authorName = await conn.getName(m.sender).catch(() => "Anónimo")
+            try {
+                authorName = await conn.getName(m.sender)
+            } catch {
+                authorName = "Anónimo"
+            }
             pp = await conn.profilePictureUrl(m.sender, 'image').catch(_ => 'https://telegra.ph/file/320b066dc81928b782c7b.png')
         } else if (m.quoted && m.quoted.text) {
             txt = m.quoted.text
-            authorName = await conn.getName(m.sender).catch(() => "Anónimo")
+            try {
+                authorName = await conn.getName(m.sender)
+            } catch {
+                authorName = "Anónimo"
+            }
             pp = await conn.profilePictureUrl(m.sender, 'image').catch(_ => 'https://telegra.ph/file/320b066dc81928b782c7b.png')
         } else {
             return error('Formato inválido')
@@ -79,7 +86,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         try {
             const json = await axios.post('https://btzqc.betabotz.eu.org/generate', obj, { headers: { 'Content-Type': 'application/json' }})
             const buffer = Buffer.from(json.data.result.image, 'base64')
-            const stiker = await sticker(buffer, false, '', '') // <-- AQUI LO CAMBIE, YA NO USA CONFIG
+            const stiker = await sticker(buffer, false, '', '')
 
             if (stiker) {
                 await conn.sendFile(m.chat, stiker, 'Quotely.webp', '', m)
