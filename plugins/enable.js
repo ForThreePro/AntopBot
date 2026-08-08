@@ -1,6 +1,3 @@
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
-
 let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isROwner }) => {
   let isEnable = /true|enable|(turn)?on|1/i.test(args[0])
   let chat = global.db.data.chats[m.chat]
@@ -62,13 +59,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
 
   if (fail) return
 
-  const pathImg = join(process.cwd(), 'storage', 'img', 'catalogo.png')
-  let catalogoImg
-  if (existsSync(pathImg)) {
-    catalogoImg = readFileSync(pathImg)
-  } else {
-    catalogoImg = { url: 'https://files.evogb.win/qS154V.jpg' }
-  }
+  // SOLO LINK - YA NO USA CATALOGO.PNG
+  let catalogoImg = { url: 'https://files.evogb.win/qS154V.jpg' }
 
   let estadoTexto = isEnable? 'Activado 🌀' : 'Desactivado ✖️'
   let estadoEmoji = isEnable? '🟢' : '🔴'
@@ -85,7 +77,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
 *Powered by*: SON GOKU PREM 💥`
 
   await conn.sendMessage(m.chat, {
-    image: catalogoImg.byteLength? catalogoImg : { url: catalogoImg.url },
+    image: catalogoImg,
     caption: statusTxt,
     mentions: [m.sender]
   }, { quoted: m })
