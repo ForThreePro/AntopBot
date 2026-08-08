@@ -1,6 +1,6 @@
 import { WAMessageStubType } from '@whiskeysockets/baileys'
-
-const LINK_FALLBACK = 'https://files.catbox.moe/1j784p.jpg' // TU LINK
+import { readFileSync, existsSync } from 'fs'
+import { join } from 'path'
 
 const handler = async (m, { conn, args, isAdmin, isOwner }) => {
   if (!isAdmin &&!isOwner) return conn.reply(m.chat, `❌ *Solo admins pueden usar este comando*`, m)
@@ -26,25 +26,24 @@ handler.admin = true
 
 handler.before = async function (m, { conn, groupMetadata }) {
   try {
-    if (!m.messageStubType ||!m.isGroup) return true
+    if (!m.messageStubType ||!m.isGroup) return!0
     const chat = global.db?.data?.chats?.[m.chat]
-    if (!chat ||!chat.bienvenida) return true
+    if (!chat ||!chat.bienvenida) return!0
 
-    let userJid = m.messageStubParameters?.[0] || m.participant
-    if (!userJid) return true
+    const userJid = m.messageStubParameters?.[0] || m.participant
+    if (!userJid) return!0
 
-    // FIX: FORZAR JID CORRECTO PARA MENCION
-    userJid = userJid.replace('@lid', '@s.whatsapp.net')
-    const userTag = `@${userJid.split('@')[0]}`
-
-    // FOTO: 1. Usuario 2. Link directo. Ya no busca catalogo.png
+    // Foto del usuario o fallback
     let pp
     try {
       pp = await conn.profilePictureUrl(userJid, 'image')
     } catch {
-      pp = LINK_FALLBACK // SI NO TIENE FOTO USA EL LINK
+      const pathImg = join(process.cwd(), 'storage', 'img', 'catalogo.png')
+      if (existsSync(pathImg)) pp = readFileSync(pathImg)
+      else pp = { url: 'https://files.catbox.moe/1j784p.jpg' }
     }
 
+    const userTag = `@${userJid.split('@')[0]}`
     const groupName = groupMetadata.subject
     const groupDesc = groupMetadata.desc || 'Sin descripción'
     const membersCount = groupMetadata.participants.length
@@ -73,10 +72,9 @@ handler.before = async function (m, { conn, groupMetadata }) {
 
     if (txt) {
       await conn.sendMessage(m.chat, {
-        image: { url: pp }, // AHORA SIEMPRE USA URL
+        image: typeof pp === 'string'? { url: pp } : pp,
         caption: txt,
-        mentions: [userJid],
-        contextInfo: { mentionedJid: [userJid] } // DOBLE MENCION PARA QUE PINTE
+        mentions: [userJid]
       })
 
       if (audio) {
@@ -90,7 +88,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
   } catch (e) {
     console.error("Error en Bienvenida Audio:", e)
   }
-  return true
+  return!0
 }
 
 export default handler
