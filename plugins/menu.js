@@ -2,15 +2,11 @@ import os from 'os'
 import { performance } from 'perf_hooks'
 
 let handler = async (m, { conn, usedPrefix }) => {
-  // 1. MENSAJE DE CARGA
   let loadMsg = await conn.reply(m.chat, `🐉 𓆩 𝗖𝗔𝗥𝗚𝗔𝗡𝗗𝗢 𝗠𝗘𝗡𝗨 𓆪 🐉\n\n⏳ *Espere un momento...*\n> Cargando sistema Saiyan...`, m)
 
   let taguser = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
-
-  // TU IMAGEN
   let img = { url: 'https://files.evogb.win/qS154V.jpg' }
 
-  // Info del bot
   let uptime = process.uptime() * 1000
   let _uptime = clockString(uptime)
   let totalreg = Object.keys(global.db.data.users).length
@@ -23,7 +19,6 @@ let handler = async (m, { conn, usedPrefix }) => {
   let ownerTag = `@${owner}`
   let numBot = conn.user.jid.split('@')[0]
 
-  // Agrupar comandos por tags
   let help = Object.values(global.plugins).filter(p => p.help &&!p.disabled)
   let groups = {}
   for (let plugin of help) {
@@ -33,11 +28,31 @@ let handler = async (m, { conn, usedPrefix }) => {
     else groups[category].push(plugin.help)
   }
 
-  // Iconos por categoria
+  // 1 EMOJI POR CATEGORÍA
   const icons = {
-    prem: '🍃', juegos: '😂', grupos: '📁', info: '☁️', owner: '☕',
-    sticker: '🧩', tools: '🎐', diversión: '🍒', rpg: '📁', descarga: '📁',
-    anime: '📁', search: '📁', config: '📁', otros: '📁'
+    search: '🔍', // BUSQUEDA
+    download: '⬇️', // DESCARGAS
+    game: '🎮', // JUEGOS
+    rpg: '⚔️', // RPG
+    config: '⚙️', // CONFIG
+    group: '👥', // GRUPOS
+    owner: '👑', // OWNER
+    info: 'ℹ️', // INFO
+    fun: '😂', // DIVERSION
+    anime: '🌸', // ANIME
+    sticker: '🧩', // STICKERS
+    tools: '🛠️', // HERRAMIENTAS
+    nsfw: '🔞', // NSFW
+    audio: '🎵', // AUDIO
+    prem: '🍃', // PREM
+    otros: '📁' // OTROS
+  }
+
+  const categoryNames = {
+    search: 'BUSQUEDA', download: 'DESCARGAS', game: 'JUEGOS', rpg: 'RPG',
+    config: 'CONFIG', group: 'GRUPOS', owner: 'OWNER', info: 'INFO',
+    fun: 'DIVERSION', anime: 'ANIME', sticker: 'STICKERS', tools: 'HERRAMIENTAS',
+    nsfw: 'NSFW', audio: 'AUDIO', prem: 'PREM', otros: 'OTROS'
   }
 
   let menu = `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉\n\n`
@@ -57,9 +72,9 @@ let handler = async (m, { conn, usedPrefix }) => {
   menu += `名 ─ *modo:* public﹔\n\n`
   menu += `> ❍ 𝖴𝗌𝖺. 𝖺𝗇𝗍𝖾𝗌 𝖽𝖾 𝖼𝖺𝖽𝖺 𝖼𝗈𝗆𝖺𝗇𝖽𝗈 𝗉𝖺𝗋𝖺 𝖺𝖼𝗍𝗂𝗏𝖺𝗋𝗅𝗈\n`
 
-  // Listar categorias
   for (let category in groups) {
     let icon = icons[category] || '📁'
+    let catName = categoryNames[category] || category.toUpperCase()
     menu += `.⃟𖥔 ݁. 𖦹˙— \`\`𝐏𝐫𝐞𝐦\`\` —˙𖦹.${icon}꒷\n`
     for (let cmd of groups[category]) {
       menu += `${icon} ➛.${cmd}\n`
@@ -76,7 +91,6 @@ let handler = async (m, { conn, usedPrefix }) => {
   menu += `> "No subestimes mi poder... o serás polvo" ⚡\n`
   menu += `━━━━━━━━━━━`
 
-  // 2. BORRA EL "ESPERE" Y MANDA EL MENU
   await conn.sendMessage(m.chat, { delete: loadMsg.key })
   await conn.sendMessage(m.chat, {
     image: img,
