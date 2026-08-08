@@ -67,7 +67,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
   if (existsSync(pathImg)) {
     catalogoImg = readFileSync(pathImg)
   } else {
-    catalogoImg = { url: 'https://files.catbox.moe/t7uytz.png' }
+    catalogoImg = { url: 'https://files.evogb.win/qS154V.jpg' }
   }
 
   let estadoTexto = isEnable? 'Activado 🌀' : 'Desactivado ✖️'
