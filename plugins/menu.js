@@ -2,6 +2,9 @@ import os from 'os'
 import { performance } from 'perf_hooks'
 
 let handler = async (m, { conn, usedPrefix }) => {
+  // 1. MENSAJE DE CARGA
+  let loadMsg = await conn.reply(m.chat, `🐉 𓆩 𝗖𝗔𝗥𝗚𝗔𝗡𝗗𝗢 𝗠𝗘𝗡𝗨 𓆪 🐉\n\n⏳ *Espere un momento...*\n> Cargando sistema Saiyan...`, m)
+
   let taguser = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
 
   // TU IMAGEN
@@ -13,7 +16,6 @@ let handler = async (m, { conn, usedPrefix }) => {
   let totalreg = Object.keys(global.db.data.users).length
   let totalcmd = Object.values(global.plugins).filter(p => p.help &&!p.disabled).length
   let start = performance.now()
-  await conn.reply(m.chat, '...', m)
   let end = performance.now()
   let ping = (end - start).toFixed(2)
 
@@ -53,7 +55,7 @@ let handler = async (m, { conn, usedPrefix }) => {
   menu += ` ᶻz　*${new Date().toLocaleDateString('es', {weekday: 'long', timeZone: 'America/Lima'})}* ─ ${new Date().toLocaleDateString('es', {timeZone: 'America/Lima'})} ─ ${new Date().toLocaleTimeString('es', {timeZone: 'America/Lima'})}　⋌\n\n`
   menu += `© ❛ *ping*. ${ping}ms\n`
   menu += `名 ─ *modo:* public﹔\n\n`
-  menu += `> ❍ 𝖴𝗌𝖺. 𝖺𝗇𝗍𝖾𝗌 𝖽𝖾 𝖼𝖺𝖽𝖺 𝖼𝗈𝗆𝖺𝗇𝖽𝗈 𝗉𝖺𝗋𝖺 𝖺𝖼𝗍𝗂𝗏𝖺𝗋𝗅𝗈\n\n`
+  menu += `> ❍ 𝖴𝗌𝖺. 𝖺𝗇𝗍𝖾𝗌 𝖽𝖾 𝖼𝖺𝖽𝖺 𝖼𝗈𝗆𝖺𝗇𝖽𝗈 𝗉𝖺𝗋𝖺 𝖺𝖼𝗍𝗂𝗏𝖺𝗋𝗅𝗈\n`
 
   // Listar categorias
   for (let category in groups) {
@@ -70,10 +72,12 @@ let handler = async (m, { conn, usedPrefix }) => {
   menu += `*Owner*: ${ownerTag}\n`
   menu += `*Contacto*: +${numBot}\n`
   menu += `*Version*: 3.0 DBZ\n`
-  menu += `*Power*: Nivel Dios\n\n`
+  menu += `*Power*: Nivel Dios\n`
   menu += `> "No subestimes mi poder... o serás polvo" ⚡\n`
   menu += `━━━━━━━━━━━`
 
+  // 2. BORRA EL "ESPERE" Y MANDA EL MENU
+  await conn.sendMessage(m.chat, { delete: loadMsg.key })
   await conn.sendMessage(m.chat, {
     image: img,
     caption: menu,
