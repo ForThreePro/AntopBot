@@ -6,7 +6,7 @@ let handler = async (m, { conn, args, usedPrefix, command, isAdmin, isOwner }) =
   let chat = global.db.data.chats[m.chat] || {}
   global.db.data.chats[m.chat] = chat
 
-  let action = command === 'on'
+  let action = command === 'onw'
   let type = args[0]?.toLowerCase()
 
   if (!type) {
@@ -15,37 +15,25 @@ let handler = async (m, { conn, args, usedPrefix, command, isAdmin, isOwner }) =
 📌 *Uso:*
 ${usedPrefix}on welcome
 ${usedPrefix}off bye
-${usedPrefix}on kick
-
-*Opciones:* welcome, bye, kick`, m)
+${usedPrefix}on kick`, m)
   }
 
   let estado = action? '🟢 Activado' : '🔴 Desactivado'
 
-  if (['welcome','bienvenida'].includes(type)) {
-    chat.welcome = action
-    await conn.reply(m.chat, `🐉 𓆩 𝗕𝗜𝗘𝗡𝗩𝗘𝗡𝗜𝗗𝗔 𓆪 🐉\n\n${estado}`, m)
-  }
-  else if (['bye','despedida'].includes(type)) {
-    chat.bye = action
-    await conn.reply(m.chat, `🐉 𓆩 𝗗𝗘𝗦𝗣𝗘𝗗𝗜𝗗𝗔 𓆪 🐉\n\n${estado}`, m)
-  }
-  else if (['kick','expulsar'].includes(type)) {
-    chat.kick = action
-    await conn.reply(m.chat, `🐉 𓆩 𝗘𝗫𝗣𝗨𝗟𝗦𝗜𝗢𝗡 𓆪 🐉\n\n${estado}`, m)
-  }
-  else {
-    await conn.reply(m.chat, `❌ *Opción no válida*\nUsa: welcome, bye, kick`, m)
-  }
+  if (['welcome','bienvenida'].includes(type)) chat.welcome = action
+  else if (['bye','despedida'].includes(type)) chat.bye = action
+  else if (['kick','expulsar'].includes(type)) chat.kick = action
+  else return m.reply(`❌ Opciones: welcome, bye, kick`)
+
+  await conn.reply(m.chat, `🐉 𓆩 ${type.toUpperCase()} 𓆪 🐉\n\n${estado}`, m)
 }
 
 handler.help = ['on <welcome/bye/kick>', 'off <welcome/bye/kick>']
 handler.tags = ['config']
-handler.command = /^(on|off)$/i
+handler.command = /^(onw|offw)$/i // interno es onw/offw
+handler.customPrefix = /^(\.|#|\!)(on|off)\s/i // PERO DETECTA.on y.off
 handler.group = true
 handler.admin = true
-handler.before = true // para que tenga prioridad sobre otros on/off
-handler.limit = false
 
 handler.before = async function (m, { conn, groupMetadata }) {
   if (!m.messageStubType ||!m.isGroup) return true
