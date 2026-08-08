@@ -80,8 +80,8 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 *Powered by*: SON GOKU PREM 💥
 *Owner*: @whois.yallico`
 
-    // Imagen
-    const imageUrl = 'https://files.evogb.win/jgBvm8.jpg'
+    // Imagen a puro link - sin catalogo.png
+    const imageUrl = 'https://files.evogb.win/qS154V.jpg'
 
     await conn.sendMessage(m.chat, {
       image: { url: imageUrl },
