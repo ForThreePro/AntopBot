@@ -1,6 +1,7 @@
 import fs from 'fs'
 const ARCHIVO = './sorteos.json'
 if (!fs.existsSync(ARCHIVO)) fs.writeFileSync(ARCHIVO, '[]')
+let temp = {} // Para guardar datos temporales
 
 function cargar() { return JSON.parse(fs.readFileSync(ARCHIVO)) }
 function guardar(data) { fs.writeFileSync(ARCHIVO, JSON.stringify(data, null, 2)) }
@@ -8,58 +9,67 @@ function guardar(data) { fs.writeFileSync(ARCHIVO, JSON.stringify(data, null, 2)
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     let sorteos = cargar()
     let grupo = m.chat
+    let user = m.sender
 
-    try {
-        // 1. COMANDO .lista Dia | Nombre | Numero | Premio
-        if (command === 'lista') {
-            await m.react('📝')
-            
-            let partes = text.split('|')
-            if (partes.length < 4) return m.reply(`❌ *Formato nuevo:*\n${usedPrefix}lista DIA | Nombre | Número | Premio\n\n*Ejemplo:* ${usedPrefix}lista jueves | Maria | 91 | Bot\n*Días:* lunes martes miercoles jueves viernes sabado domingo hoy`)
+    // PASO 1:.lista Maria | 91 | Bot
+    if (command === 'lista') {
+        await m.react('📝')
+        let partes = text.split('|')
+        if (partes.length < 3) return m.reply(`*Uso corto:*\n${usedPrefix}lista Nombre | Numero | Premio\n*Ej:* ${usedPrefix}lista Maria | 91 | Bot`)
 
-            let [dia, nombre, numero, premio] = partes.map(v => v.trim().toLowerCase())
-            dia = dia.toLowerCase()
+        temp[user] = { nombre: partes[0].trim(), numero: partes[1].trim(), premio: partes[2].trim() }
 
-            sorteos.push({ 
-                id: Date.now(), 
-                grupo, 
-                nombre, 
-                numero, 
-                premio, 
-                dia, 
-                estado: 'registrado',
-                fecha: new Date().toLocaleDateString('es-PE')
-            })
-            guardar(sorteos)
+        // Mandamos los días en 1 sola línea con botones
+        await conn.sendMessage(m.chat, {
+            text: `👤 ${temp[user].nombre}\n🎁 ${temp[user].premio}\n\n*Elige el día:*`,
+            footer: '🐉 SON GOKU BOT',
+            templateButtons: [
+                {index: 1, quickReplyButton: {displayText: 'Lun', id: `.dia lunes`}},
+                {index: 2, quickReplyButton: {displayText: 'Mar', id: `.dia martes`}},
+                {index: 3, quickReplyButton: {displayText: 'Mie', id: `.dia miercoles`}},
+                {index: 4, quickReplyButton: {displayText: 'Jue', id: `.dia jueves`}},
+                {index: 5, quickReplyButton: {displayText: 'Vie', id: `.dia viernes`}},
+            ],
+            templateButtons: [
+                {index: 6, quickReplyButton: {displayText: 'Sab', id: `.dia sabado`}},
+                {index: 7, quickReplyButton: {displayText: 'Dom', id: `.dia domingo`}},
+                {index: 8, quickReplyButton: {displayText: 'Hoy', id: `.dia hoy`}},
+            ]
+        }, { quoted: m })
+    }
 
-            await conn.reply(m.chat, `✅ *Se agregó 1 sorteo(s) al día ${dia}*\n\n👤 ${nombre}\n📱 ${numero}\n🎁 ${premio}`, m)
-        }
+    // PASO 2:.dia jueves
+    if (command === 'dia') {
+        await m.react('✅')
+        let dia = text.toLowerCase().trim()
+        if (!temp[user]) return m.reply(`❌ Primero usa.lista`)
 
-        // 2. COMANDO .ver
-        if (command === 'ver') {
-            await m.react('📋')
-            let dia = text.toLowerCase().trim()
-            if (!dia) return m.reply(`*Uso:* ${usedPrefix}ver jueves`)
+        let {nombre, numero, premio} = temp[user]
+        let sorteos = cargar()
 
-            let delDia = sorteos.filter(s => s.grupo === grupo && s.dia === dia && s.estado === 'registrado')
-            if (delDia.length === 0) return m.reply(`📭 No hay sorteos para *${dia}*`)
+        sorteos.push({ id: Date.now(), grupo, nombre, numero, premio, dia, estado: 'registrado' })
+        guardar(sorteos)
+        delete temp[user] // Borramos lo temporal
 
-            let mensaje = `📋 *SORTEOS DEL DÍA: ${dia.toUpperCase()}*\n\n`
-            delDia.forEach((s, i) => { mensaje += `*${i + 1}.* 👤 ${s.nombre}\n   📱 ${s.numero}\n   🎁 ${s.premio}\n\n` })
-            await conn.reply(m.chat, mensaje, m)
-        }
+        await conn.reply(m.chat, `✅ *Agregado al día ${dia}*\n👤 ${nombre}\n📱 ${numero}\n🎁 ${premio}`, m)
+    }
 
-    } catch(e) {
-        await m.react('❌')
-        await conn.reply(m.chat, `Error: ${e.message}`, m)
-        console.log(e)
+    // VER
+    if (command === 'ver') {
+        await m.react('📋')
+        let dia = text.toLowerCase().trim()
+        if (!dia) return m.reply(`*Uso:* ${usedPrefix}ver jueves`)
+        let delDia = sorteos.filter(s => s.grupo === grupo && s.dia === dia)
+        if (delDia.length === 0) return m.reply(`📭 Vacío`)
+        let mensaje = `📋 *${dia.toUpperCase()}*\n\n` + delDia.map((s,i)=>`*${i+1}.* ${s.nombre} - ${s.numero}\n🎁 ${s.premio}`).join('\n\n')
+        await conn.reply(m.chat, mensaje, m)
     }
 }
 
-handler.help = ['lista', 'ver']
+handler.help = ['lista', 'dia', 'ver']
 handler.tags = ['sorteos']
-handler.command = ['lista', 'ver']
+handler.command = ['lista', 'dia', 'ver']
 handler.group = true
-handler.admin = false // OJO: LO QUITÉ PARA PROBAR
+handler.admin = false
 
 export default handler
