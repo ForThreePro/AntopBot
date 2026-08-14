@@ -8,7 +8,9 @@ function guardar(data) { fs.writeFileSync(ARCHIVO, JSON.stringify(data, null, 2)
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     let sorteos = cargar()
     let grupo = m.chat
+    let sender = m.sender
 
+    // 1. COMANDO .lista
     if (command === 'lista') {
         await m.react('📝')
         if (!text) return m.reply(`❌ *Formato incorrecto*\n\n*Uso:* ${usedPrefix}lista Nombre | Número | Premio`)
@@ -19,19 +21,50 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let [nombre, numero, premio] = partes.map(v => v.trim())
         let idTemp = Date.now()
 
-        sorteos.push({ id: idTemp, grupo, nombre, numero, premio, dia: null, estado: 'pendiente' })
+        sorteos.push({ id: idTemp, grupo, sender, nombre, numero, premio, dia: null, estado: 'pendiente' })
         guardar(sorteos)
 
-        // CAMBIO CLAVE: Usar templateButtons para que funcione en grupos
+        // EN VEZ DE BOTON, MANDAMOS LA LISTA DIRECTO
+        const sections = [{
+            title: "SELECCIONA UN DIA PARA REGISTRAR TU SORTEO",
+            rows: [
+                { title: "Lunes", rowId: `.setdia lunes ${idTemp}` },
+                { title: "Martes", rowId: `.setdia martes ${idTemp}` },
+                { title: "Miércoles", rowId: `.setdia miercoles ${idTemp}` },
+                { title: "Jueves", rowId: `.setdia jueves ${idTemp}` },
+                { title: "Viernes", rowId: `.setdia viernes ${idTemp}` },
+                { title: "Sábado", rowId: `.setdia sabado ${idTemp}` },
+                { title: "Domingo", rowId: `.setdia domingo ${idTemp}` },
+                { title: "HOY", rowId: `.setdia hoy ${idTemp}` },
+            ]
+        }]
+
         await conn.sendMessage(m.chat, {
             text: `✨ *Datos: 🌈!!*\nSelecciona el día para anotar tu sorteo\n\n👤 *Nombre:* ${nombre}\n📱 *Número:* ${numero}\n🎁 *Premio:* ${premio}`,
             footer: '🐉 SON GOKU BOT 💥',
-            templateButtons: [
-                { index: 1, quickReplyButton: { displayText: '📅 Seleccionar día', id: `seleccionar_dia_${idTemp}` } }
-            ]
+            title: "📅 Días disponibles",
+            buttonText: "Seleccionar",
+            sections
         }, { quoted: m })
     }
 
+    // 2. COMANDO .setdia - Este se ejecuta cuando eliges de la lista
+    if (command === 'setdia') {
+        await m.react('✅')
+        let [dia, idTemp] = text.split(' ')
+        if (!dia || !idTemp) return
+
+        let sorteo = sorteos.find(s => s.id == idTemp && s.estado === 'pendiente' && s.sender === sender)
+        if (!sorteo) return m.reply(`❌ Ese sorteo ya fue registrado o expiró`)
+
+        sorteo.dia = dia
+        sorteo.estado = 'registrado'
+        guardar(sorteos)
+
+        await conn.reply(m.chat, `✅ *Se agregó 1 sorteo(s) al día ${dia}*\n\n👤 ${sorteo.nombre}\n📱 ${sorteo.numero}\n🎁 ${sorteo.premio}`, m)
+    }
+
+    // 3. COMANDO .ver
     if (command === 'ver') {
         await m.react('📋')
         let dia = text.toLowerCase().trim()
@@ -41,65 +74,14 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         if (delDia.length === 0) return m.reply(`📭 No hay sorteos para *${dia}*`)
 
         let mensaje = `📋 *SORTEOS DEL DÍA: ${dia.toUpperCase()}*\n\n`
-        delDia.forEach((s, i) => { mensaje += `*${i + 1}.* 👤 ${s.nombre}\n 📱 ${s.numero}\n 🎁 ${s.premio}\n\n` })
+        delDia.forEach((s, i) => { mensaje += `*${i + 1}.* 👤 ${s.nombre}\n   📱 ${s.numero}\n   🎁 ${s.premio}\n\n` })
         await conn.reply(m.chat, mensaje, m)
-    }
-}
-
-// DETECTOR DE BOTONES - ESTA ES LA PARTE IMPORTANTE
-handler.before = async (m, { conn }) => {
-    if (!m.message) return
-
-    let sorteos = cargar()
-
-    // 1. DETECTAR BOTÓN QUICK REPLY
-    let buttonId = m.message?.templateButtonReplyMessage?.selectedId || m.message?.buttonsResponseMessage?.selectedButtonId
-    if (buttonId && buttonId.startsWith('seleccionar_dia_')) {
-        let idTemp = buttonId.replace('seleccionar_dia_', '')
-
-        await conn.sendMessage(m.chat, {
-            text: "Elige el día del sorteo",
-            footer: "🐉 SON GOKU BOT 💥",
-            title: "📅 Días disponibles",
-            buttonText: "Seleccionar",
-            sections: [{
-                title: "SELECCIONA UN DIA",
-                rows: [
-                    { title: "Lunes", rowId: `dia_lunes_${idTemp}` },
-                    { title: "Martes", rowId: `dia_martes_${idTemp}` },
-                    { title: "Miércoles", rowId: `dia_miercoles_${idTemp}` },
-                    { title: "Jueves", rowId: `dia_jueves_${idTemp}` },
-                    { title: "Viernes", rowId: `dia_viernes_${idTemp}` },
-                    { title: "Sábado", rowId: `dia_sabado_${idTemp}` },
-                    { title: "Domingo", rowId: `dia_domingo_${idTemp}` },
-                    { title: "HOY", rowId: `dia_hoy_${idTemp}` },
-                ]
-            }]
-        }, { quoted: m })
-        return true // IMPORTANTE: esto hace que el bot lo procese
-    }
-
-    // 2. DETECTAR LISTA
-    let rowId = m.message?.listResponseMessage?.singleSelectReply?.selectedRowId
-    if (rowId && rowId.startsWith('dia_')) {
-        let partes = rowId.split('_')
-        let dia = partes[1]
-        let idTemp = partes[2]
-
-        let sorteo = sorteos.find(s => s.id == idTemp && s.estado === 'pendiente')
-        if (sorteo) {
-            sorteo.dia = dia
-            sorteo.estado = 'registrado'
-            guardar(sorteos)
-            await conn.reply(m.chat, `✅ *Se agregó 1 sorteo(s) al día ${dia}*\n\n👤 ${sorteo.nombre}\n📱 ${sorteo.numero}\n🎁 ${sorteo.premio}`, m)
-        }
-        return true
     }
 }
 
 handler.help = ['lista', 'ver']
 handler.tags = ['sorteos']
-handler.command = ['lista', 'ver']
+handler.command = ['lista', 'ver', 'setdia'] // OJO: agregamos setdia
 handler.group = true
 handler.admin = true
 
