@@ -5,39 +5,51 @@ if (!fs.existsSync(ARCHIVO)) fs.writeFileSync(ARCHIVO, '[]')
 function cargar() { return JSON.parse(fs.readFileSync(ARCHIVO)) }
 function guardar(data) { fs.writeFileSync(ARCHIVO, JSON.stringify(data, null, 2)) }
 
-const DIAS = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado']
+const DIAS = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 
-// FUNCION PARA MOSTRAR LA LISTA
-function mostrarLista(sorteos, grupo) {
+async function mostrarLista(conn, m, sorteos, grupo) {
     let todos = sorteos.filter(s => s.grupo === grupo)
-    if (todos.length === 0) return `📭 *No hay sorteos registrados*`
+    let nombreGrupo = await conn.getName(grupo)
+    let foto = await conn.profilePictureUrl(grupo, 'image').catch(_ => null)
 
-    let mensaje = `╭─〔 📋 *SORTEOS DE LA SEMANA* 〕─╮\n\n`
+    let mensaje = `╭───⊰ 🎯 *SORTEOS SEMANALES* ⊱───╮\n`
+    mensaje += `│ 🏷️ *GRUPO:* ${nombreGrupo}\n`
+    mensaje += `╰──────────────────────────────╯\n\n`
+
     DIAS.forEach(dia => {
-        let normales = todos.filter(s => s.dia === dia &&!s.extra)
+        let normales = todos.filter(s => s.dia === dia && !s.extra)
         let extras = todos.filter(s => s.dia === dia && s.extra)
 
-        if (normales.length > 0) {
-            mensaje += `│ *${dia.toUpperCase()}*\n`
-            normales.forEach((s,i)=> {
-                mensaje += `│ ${i+1}. 👤 ${s.nombre}\n`
-                mensaje += `│ 📱 ${s.numero}\n`
-                mensaje += `│ 🎁 ${s.premio}\n`
-                mensaje += `│ 🕐 ${s.fecha} ${s.hora}\n\n`
+        mensaje += `📅 *${dia.toUpperCase()}*\n`
+        
+        if (normales.length === 0 && extras.length === 0) {
+            mensaje += `   └─ _Sin sorteos_\n\n`
+        } else {
+            let contador = 1
+            normales.forEach((s)=> {
+                mensaje += `   ├─ #${contador} 👤 ${s.nombre}\n`
+                mensaje += `   │  📱 ${s.numero}\n`
+                mensaje += `   │  🎁 ${s.premio}\n`
+                mensaje += `   │  🕐 ${s.fecha} ${s.hora}\n`
+                contador++
             })
-        }
-        if (extras.length > 0) {
-            mensaje += `│ *${dia.toUpperCase()} - EXTRAS ⭐*\n`
-            extras.forEach((s,i)=> {
-                mensaje += `│ ${i+1}. 👤 ${s.nombre}\n`
-                mensaje += `│ 📱 ${s.numero}\n`
-                mensaje += `│ 🎁 ${s.premio}\n`
-                mensaje += `│ 🕐 ${s.fecha} ${s.hora}\n\n`
+            extras.forEach((s)=> {
+                mensaje += `   ├─ ⭐ EXTRA #${contador} 👤 ${s.nombre}\n`
+                mensaje += `   │  📱 ${s.numero}\n`
+                mensaje += `   │  🎁 ${s.premio}\n`
+                mensaje += `   │  🕐 ${s.fecha} ${s.hora}\n`
+                contador++
             })
+            mensaje += `\n`
         }
     })
-    mensaje += `╰────────────────────────╯`
-    return mensaje
+    mensaje += `╭─── Total: ${todos.length} sorteos ───╮`
+
+    if (foto) {
+        await conn.sendMessage(grupo, { image: { url: foto }, caption: mensaje }, { quoted: m })
+    } else {
+        await conn.reply(grupo, mensaje, m)
+    }
 }
 
 let handler = async (m, { conn, text, usedPrefix, command, isAdmin }) => {
@@ -47,13 +59,10 @@ let handler = async (m, { conn, text, usedPrefix, command, isAdmin }) => {
     if (command === 'lista') {
         await m.react('✅')
 
-        // SI ES.lista ver
         if (text === 'ver') {
-            let lista = mostrarLista(sorteos, grupo)
-            return await conn.reply(m.chat, lista, m)
+            return await mostrarLista(conn, m, sorteos, grupo)
         }
 
-        // SI ES PARA AGREGAR:.lista Maria / 926993155 / Bot
         let partes = text.split('/')
         if (partes.length < 3) return m.reply(`*Uso:* ${usedPrefix}lista Nombre / Numero / Premio [extra]\n*Ej:* ${usedPrefix}lista Maria / 926993155 / Bot`)
 
@@ -76,15 +85,13 @@ let handler = async (m, { conn, text, usedPrefix, command, isAdmin }) => {
         sorteos.push({ id: Date.now(), grupo, dia, nombre, numero, premio, fecha, hora, extra: esExtra })
         guardar(sorteos)
 
-        // AL ANOTAR, MUESTRA LA LISTA COMPLETA DIRECTO
-        let listaActualizada = mostrarLista(sorteos, grupo)
-        let aviso = esExtra? `⭐ *SORTEO EXTRA ANOTADO* ⭐\n\n` : `✅ *ANOTADO PARA ${dia.toUpperCase()}* ✅\n\n`
-        await conn.reply(m.chat, aviso + listaActualizada, m)
+        await m.reply(esExtra ? `⭐ *SORTEO EXTRA ANOTADO* ⭐` : `✅ *ANOTADO PARA ${dia.toUpperCase()}* ✅`)
+        await mostrarLista(conn, m, sorteos, grupo)
     }
 
     if (command === 'delall') {
         if (!isAdmin) return m.reply('❌ *Solo admins pueden borrar todo*')
-        sorteos = sorteos.filter(s => s.grupo!== grupo)
+        sorteos = sorteos.filter(s => s.grupo !== grupo)
         guardar(sorteos)
         await m.react('🗑️')
         return await conn.reply(m.chat, `🗑️ *Se borró toda la lista del grupo*`, m)
