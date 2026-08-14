@@ -1,7 +1,7 @@
 import fs from 'fs'
 const ARCHIVO = './sorteos.json'
 if (!fs.existsSync(ARCHIVO)) fs.writeFileSync(ARCHIVO, '[]')
-let temp = {} // Para guardar datos temporales
+let temp = {}
 
 function cargar() { return JSON.parse(fs.readFileSync(ARCHIVO)) }
 function guardar(data) { fs.writeFileSync(ARCHIVO, JSON.stringify(data, null, 2)) }
@@ -11,34 +11,40 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let grupo = m.chat
     let user = m.sender
 
-    // PASO 1:.lista Maria | 91 | Bot
     if (command === 'lista') {
         await m.react('📝')
         let partes = text.split('|')
-        if (partes.length < 3) return m.reply(`*Uso corto:*\n${usedPrefix}lista Nombre | Numero | Premio\n*Ej:* ${usedPrefix}lista Maria | 91 | Bot`)
+        if (partes.length < 3) return m.reply(`*Uso:* ${usedPrefix}lista Nombre | Numero | Premio`)
 
         temp[user] = { nombre: partes[0].trim(), numero: partes[1].trim(), premio: partes[2].trim() }
 
-        // Mandamos los días en 1 sola línea con botones
-        await conn.sendMessage(m.chat, {
-            text: `👤 ${temp[user].nombre}\n🎁 ${temp[user].premio}\n\n*Elige el día:*`,
-            footer: '🐉 SON GOKU BOT',
-            templateButtons: [
-                {index: 1, quickReplyButton: {displayText: 'Lun', id: `.dia lunes`}},
-                {index: 2, quickReplyButton: {displayText: 'Mar', id: `.dia martes`}},
-                {index: 3, quickReplyButton: {displayText: 'Mie', id: `.dia miercoles`}},
-                {index: 4, quickReplyButton: {displayText: 'Jue', id: `.dia jueves`}},
-                {index: 5, quickReplyButton: {displayText: 'Vie', id: `.dia viernes`}},
-            ],
-            templateButtons: [
-                {index: 6, quickReplyButton: {displayText: 'Sab', id: `.dia sabado`}},
-                {index: 7, quickReplyButton: {displayText: 'Dom', id: `.dia domingo`}},
-                {index: 8, quickReplyButton: {displayText: 'Hoy', id: `.dia hoy`}},
-            ]
-        }, { quoted: m })
+        // FORZAR BOTONES CON sendButton
+        let buttons = [
+            {buttonId: `.dia lunes`, buttonText: {displayText: 'Lunes'}, type: 1},
+            {buttonId: `.dia martes`, buttonText: {displayText: 'Martes'}, type: 1},
+            {buttonId: `.dia miercoles`, buttonText: {displayText: 'Miercoles'}, type: 1},
+        ]
+        let buttons2 = [
+            {buttonId: `.dia jueves`, buttonText: {displayText: 'Jueves'}, type: 1},
+            {buttonId: `.dia viernes`, buttonText: {displayText: 'Viernes'}, type: 1},
+            {buttonId: `.dia sabado`, buttonText: {displayText: 'Sabado'}, type: 1},
+        ]
+        let buttons3 = [
+            {buttonId: `.dia domingo`, buttonText: {displayText: 'Domingo'}, type: 1},
+            {buttonId: `.dia hoy`, buttonText: {displayText: 'HOY'}, type: 1},
+        ]
+
+        await conn.sendButton(m.chat,
+            `✨ *NUEVO SORTEO* ✨\n\n👤 *Nombre:* ${temp[user].nombre}\n📱 *Numero:* ${temp[user].numero}\n🎁 *Premio:* ${temp[user].premio}\n\n*Elige el día:*`,
+            '🐉 SON GOKU BOT 💥',
+            null,
+            buttons,
+            m
+        )
+        await conn.sendButton(m.chat, ' ', '', null, buttons2, m)
+        await conn.sendButton(m.chat, ' ', '', null, buttons3, m)
     }
 
-    // PASO 2:.dia jueves
     if (command === 'dia') {
         await m.react('✅')
         let dia = text.toLowerCase().trim()
@@ -46,15 +52,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
         let {nombre, numero, premio} = temp[user]
         let sorteos = cargar()
-
         sorteos.push({ id: Date.now(), grupo, nombre, numero, premio, dia, estado: 'registrado' })
         guardar(sorteos)
-        delete temp[user] // Borramos lo temporal
+        delete temp[user]
 
         await conn.reply(m.chat, `✅ *Agregado al día ${dia}*\n👤 ${nombre}\n📱 ${numero}\n🎁 ${premio}`, m)
     }
 
-    // VER
     if (command === 'ver') {
         await m.react('📋')
         let dia = text.toLowerCase().trim()
