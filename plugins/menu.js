@@ -2,7 +2,7 @@ import os from 'os'
 import { performance } from 'perf_hooks'
 
 let handler = async (m, { conn, usedPrefix }) => {
-  let loadMsg = await conn.reply(m.chat, `🐉 𓆩 𝗖𝗔𝗥𝗚𝗔𝗡𝗗𝗢 𝗠𝗘𝗡𝗨 𓆪 🐉\n\n⏳ *Espere un momento...*\n> Cargando sistema Saiyan...`, m)
+  let loadMsg = await conn.reply(m.chat, `🐸 𓆩 𝗖𝗔𝗥𝗚𝗔𝗡𝗗𝗢 𝗠𝗘𝗡𝗨 𓆪 🐸\n\n⏳ *Espere un momento...*\n> Cargando sistema Rana...`, m)
 
   let taguser = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
   let img = { url: 'https://files.evogb.win/qS154V.jpg' }
@@ -28,24 +28,10 @@ let handler = async (m, { conn, usedPrefix }) => {
     else groups[category].push(plugin.help)
   }
 
-  // 1 EMOJI POR CATEGORÍA
   const icons = {
-    search: '🔍', // BUSQUEDA
-    download: '⬇️', // DESCARGAS
-    game: '🎮', // JUEGOS
-    rpg: '⚔️', // RPG
-    config: '⚙️', // CONFIG
-    group: '👥', // GRUPOS
-    owner: '👑', // OWNER
-    info: 'ℹ️', // INFO
-    fun: '😂', // DIVERSION
-    anime: '🌸', // ANIME
-    sticker: '🧩', // STICKERS
-    tools: '🛠️', // HERRAMIENTAS
-    nsfw: '🔞', // NSFW
-    audio: '🎵', // AUDIO
-    prem: '🍃', // PREM
-    otros: '📁' // OTROS
+    search: '🔍', download: '⬇️', game: '🎮', rpg: '⚔️', config: '⚙️',
+    group: '👥', owner: '👑', info: 'ℹ️', fun: '😂', anime: '🌸',
+    sticker: '🧩', tools: '🛠️', nsfw: '🔞', audio: '🎵', prem: '🍃', otros: '📁'
   }
 
   const categoryNames = {
@@ -55,17 +41,17 @@ let handler = async (m, { conn, usedPrefix }) => {
     nsfw: 'NSFW', audio: 'AUDIO', prem: 'PREM', otros: 'OTROS'
   }
 
-  let menu = `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉\n\n`
-  menu += `⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 3.0 DBZ ：✿ 。\n`
+  let menu = `🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸\n\n`
+  menu += `⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 3.0 PREM ：✿ 。\n`
   menu += `꒰ ◞⁺⊹ ．estado: *EN LINEA* • ${_uptime}\n\n`
   menu += ` ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗔𝗖𝗧𝗜𝗩𝗢 ׅ 𝆬 ָ֢ ෆ\n`
-  menu += `🦦 ࣪ ꕀ @${taguser.split('@')[0]}. ˚. ᵎᵎ\n`
-  menu += `> *Bienvenido al sistema Saiyan*\n\n`
-  menu += `──愛 *INFORMACION DEL BOT* ╏ 💥\n`
+  menu += `🐸 ࣪ ꕀ @${taguser.split('@')[0]}. ˚. ᵎᵎ\n`
+  menu += `> *Bienvenido al sistema Rana*\n\n`
+  menu += `──🍃 *INFORMACION DEL BOT* ╏ 💚\n`
   menu += `*Usuarios*: ${totalreg} | *Comandos*: ${totalcmd}\n`
   menu += `*Owner*: ${ownerTag}\n`
   menu += `*Numero*: +${numBot}\n\n`
-  menu += ` ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 🌑 ﹚\n`
+  menu += ` ׅ 🍃 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 🌿 ﹚\n`
   menu += `> ﹒ RAM: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}mb / ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)}gb\n`
   menu += ` ᶻz　*${new Date().toLocaleDateString('es', {weekday: 'long', timeZone: 'America/Lima'})}* ─ ${new Date().toLocaleDateString('es', {timeZone: 'America/Lima'})} ─ ${new Date().toLocaleTimeString('es', {timeZone: 'America/Lima'})}　⋌\n\n`
   menu += `© ❛ *ping*. ${ping}ms\n`
@@ -83,12 +69,12 @@ let handler = async (m, { conn, usedPrefix }) => {
   }
 
   menu += `━━━━━━━━━━━\n`
-  menu += `🐉 *SON GOKU PREM BOT* 🐉\n`
+  menu += `🐸 *SAPITO BOT PREM* 🐸\n`
   menu += `*Owner*: ${ownerTag}\n`
   menu += `*Contacto*: +${numBot}\n`
-  menu += `*Version*: 3.0 DBZ\n`
-  menu += `*Power*: Nivel Dios\n`
-  menu += `> "No subestimes mi poder... o serás polvo" ⚡\n`
+  menu += `*Version*: 3.0 PREM\n`
+  menu += `*Power*: Nivel Rana\n`
+  menu += `> "Salta alto como un sapito... croac" 🍃\n`
   menu += `━━━━━━━━━━━`
 
   await conn.sendMessage(m.chat, { delete: loadMsg.key })
