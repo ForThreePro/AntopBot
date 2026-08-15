@@ -6,9 +6,14 @@ let handler = async (m, { conn, command }) => {
     // 1. RESET
     if (command === 'reset') {
         await m.react('🔄')
-        await m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+        await m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗥𝗘𝗦𝗘𝗧* 🐸
 
-> *Reiniciando sistema, por favor espere...*`)
+*━━━━━━━━━━*
+*🔄 REINICIANDO SISTEMA*
+
+> _Por favor espera unos segundos..._
+
+*━━━━━━━━━━*`)
         process.send('reset')
     }
 
@@ -17,11 +22,25 @@ let handler = async (m, { conn, command }) => {
         try {
             await m.react('👑')
             await conn.groupParticipantsUpdate(m.chat, [conn.user.jid], 'promote')
-            await m.reply(`🐉 *Administrador asignado* 
-Ya tengo poderes de admin en este grupo 💥`)
+            await m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗔𝗗𝗠𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*✅ ADMINISTRADOR ASIGNADO*
+
+*➤* Ya tengo poderes de *admin* en este grupo
+
+*━━━━━━━━━━*`)
         } catch (e) {
             await m.react('❌')
-            m.reply('❌ *Error:* No pude asignarme admin. Revisa que yo no sea admin ya o que no tengas permisos')
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* No pude asignarme *admin*
+*➤* Revisa que ya no sea admin o que tengas permisos
+
+*━━━━━━━━━━*`)
         }
     }
 
@@ -29,40 +48,54 @@ Ya tengo poderes de admin en este grupo 💥`)
     if (command === 'update' || command === 'actualizar' || command === 'fix') {
         if (m.react) await m.react('🌀')
 
-        await conn.reply(m.chat, `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+        await conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗨𝗣𝗗𝗔𝗧𝗘* 🐸
 
-> *Actualizando módulos del repositorio...*`, m)
+*━━━━━━━━━━*
+*🌀 ACTUALIZANDO MODULOS*
+
+> _Obteniendo cambios del repositorio..._
+
+*━━━━━━━━━━*`, m)
 
         exec('git pull', async (err, stdout, stderr) => {
             if (err) {
                 if (m.react) await m.react('❌')
-                return conn.reply(m.chat, `🐉 𓆩 𝗘𝗥𝗢𝗥 𓆪 🐉
+                return conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
 
-*Fallo en la actualización.*
+*━━━━━━━━━━*
+*❌ ERROR EN LA ACTUALIZACION*
 
-\`\`${err.message}\`\`\`
+*➤* Detalle: 
+\`\`${err.message}\`\`
 
-*Owner*: ${owner}`, m)
+*━━━━━━━━━━*
+*Owner:* ${owner}`, m)
             }
 
             if (stdout.includes('Already up to date.')) {
                 if (m.react) await m.react('✅')
-                return conn.reply(m.chat, `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+                return conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
 
-*El sistema ya se encuentra en su versión más reciente.*
+*━━━━━━━━━━*
+*✅ SISTEMA ACTUALIZADO*
 
-*Owner*: ${owner}`, m)
+*➤* El sistema ya está en su *versión más reciente*
+
+*━━━━━━━━━━*
+*Owner:* ${owner}`, m)
             }
 
             if (m.react) await m.react('✅')
-            return conn.reply(m.chat, `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+            return conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
 
-*Actualización aplicada con éxito.*
+*━━━━━━━━━━*
+*✅ ACTUALIZACION APLICADA*
 
-*Cambios:*
+*📋 Cambios:*
 \`\`${stdout}\`\`
 
-*Owner*: ${owner}`, m)
+*━━━━━━━━━━*
+*Owner:* ${owner}`, m)
         })
     }
 }
