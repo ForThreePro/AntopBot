@@ -8,11 +8,26 @@ const pluginsDir = path.join(__dirname, '../plugins')
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!global.owner.some(([number]) => number === m.sender.split('@')[0]))
-        return m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *ERROR* 」─╮\n│ ❌ *Solo Owner*\n╰─────────────`)
+        return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗢𝗪𝗡𝗘𝗥* 🐸
+
+*━━━━━━━━━━*
+*❌ ACCESO DENEGADO*
+
+*➤* Solo *Owner* puede usar este comando
+
+*━━━━━━━━━━*`)
 
     // ============ ADD PLUGIN ============
     if (command === 'addplugin' || command === 'añadir') {
-        if (!m.quoted) return m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *AÑADIR PLUGIN* 」─╮\n│ 🚩 *Responde a un.js*\n│ 📌 *Ejemplo:* ${usedPrefix}addplugin menu.js\n╰─────────────`)
+        if (!m.quoted) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗔𝗗𝗗 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
+
+*➤* Responde a un archivo *.js*
+*➤* Ejemplo: *${usedPrefix}addplugin menu.js*
+
+*━━━━━━━━━━*`)
 
         let name = text || m.quoted.fileName || `plugin_${Date.now()}.js`
         if (!name.endsWith('.js')) name += '.js'
@@ -22,23 +37,54 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             let media = await m.quoted.download()
             fs.writeFileSync(filePath, media)
             await m.react('✅')
-            m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *PLUGIN AÑADIDO* 」─╮\n│ 📄 *Archivo:* ${name}\n│ 📁 *Ruta:* plugins/${name}\n╰─────────────\n> *Reinicia el bot para aplicar*`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗔𝗗 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*✅ PLUGIN AÑADIDO*
+
+*📄 Archivo:* *${name}*
+*📁 Ruta:* *plugins/${name}*
+
+*━━━━━━━━━━*
+> _Reinicia el bot para aplicar los cambios_`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`❌ Error al guardar: ${e.message}`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* Error al guardar: ${e.message}
+
+*━━━━━━━━━━*`)
         }
     }
 
     // ============ EDIT PLUGIN ============
     if (command === 'editplugin' || command === 'editar') {
         let name = text
-        if (!name) return m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *EDITAR PLUGIN* 」─╮\n│ 🚩 *Uso:* ${usedPrefix}editar nombre.js\n│ 📌 *Luego responde con el código nuevo*\n╰─────────────`)
+        if (!name) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗘𝗗𝗜𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
+
+*➤* Uso: *${usedPrefix}editar nombre.js*
+*➤* Luego responde con el código nuevo
+
+*━━━━━━━━━━*`)
 
         if (!name.endsWith('.js')) name += '.js'
         let filePath = path.join(pluginsDir, name)
 
         if (!fs.existsSync(filePath))
-            return m.reply(`❌ *No existe:* ${name}`)
+            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* No existe: *${name}*
+
+*━━━━━━━━━━*`)
 
         if (!m.quoted ||!m.quoted.text) {
             let currentCode = fs.readFileSync(filePath, 'utf-8')
@@ -46,7 +92,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                 document: { url: filePath },
                 mimetype: 'text/javascript',
                 fileName: name,
-                caption: `𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *EDITAR* 」─╮\n│ 📄 *Archivo:* ${name}\n│ 💌 *Responde a este archivo con el código nuevo*\n╰─────────────`
+                caption: `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗘𝗗𝗜𝗧* 🐸
+
+*━━━━━━━━━━*
+*📄 Archivo:* *${name}*
+*💌 Responde a este archivo con el código nuevo*
+
+*━━━━━━━━━━*`
             }, { quoted: m })
             return
         }
@@ -55,70 +107,157 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             let newCode = m.quoted.text
             fs.writeFileSync(filePath, newCode)
             await m.react('✅')
-            m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *PLUGIN EDITADO* 」─╮\n│ ✏️ *Archivo:* ${name}\n╰─────────────\n> *Reinicia el bot para aplicar*`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗘𝗗𝗜𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*✅ PLUGIN EDITADO*
+
+*✏️ Archivo:* *${name}*
+
+*━━━━━━━━━━*
+> _Reinicia el bot para aplicar los cambios_`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`❌ Error: ${e.message}`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* ${e.message}
+
+*━━━━━━━━━━*`)
         }
     }
 
     // ============ GET PLUGIN ============
     if (command === 'getplugin' || command === 'get') {
-        if (!text) return m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *OBTENER PLUGIN* 」─╮\n│ 🚩 *Uso:* ${usedPrefix}getplugin nombre.js\n│ 📌 *Lista:* ${usedPrefix}plugins\n╰─────────────`)
+        if (!text) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗚𝗘𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
+
+*➤* Uso: *${usedPrefix}getplugin nombre.js*
+*➤* Lista: *${usedPrefix}plugins*
+
+*━━━━━━━━━━*`)
 
         let name = text.endsWith('.js')? text : text + '.js'
         let filePath = path.join(pluginsDir, name)
 
         if (!fs.existsSync(filePath))
-            return m.reply(`❌ *No existe el plugin:* ${name}`)
+            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* No existe el plugin: *${name}*
+
+*━━━━━━━━━━*`)
 
         try {
             let code = fs.readFileSync(filePath, 'utf-8')
             if (code.length > 4000) {
-                // Si es muy largo lo manda como documento
                 await conn.sendMessage(m.chat, {
                     document: { url: filePath },
                     mimetype: 'text/javascript',
                     fileName: name,
-                    caption: `𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *CÓDIGO* 」─╮\n│ 📄 *Archivo:* ${name}\n╰─────────────`
+                    caption: `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗖𝗢𝗗𝗜𝗚𝗢* 🐸
+
+*━━━━━━━━━━*
+*📄 Archivo:* *${name}*
+
+*━━━━━━━━━━*`
                 }, { quoted: m })
             } else {
-                // Si es corto lo manda en texto
-                m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *${name}* 」─╮\n\`\`\`js\n${code}\n\`\`\n╰─────────────`)
+                m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - ${name}* 🐸
+
+*━━━━━━━━━━*
+\`\`js
+${code}
+\`\`
+*━━━━━━━━━━*`)
             }
             await m.react('✅')
         } catch (e) {
             await m.react('❌')
-            m.reply(`❌ Error: ${e.message}`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* ${e.message}
+
+*━━━━━━━━━━*`)
         }
     }
 
     // ============ DEL PLUGIN ============
     if (command === 'delplugin' || command === 'eliminar') {
-        if (!text) return m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *ELIMINAR PLUGIN* 」─╮\n│ 🚩 *Uso:* ${usedPrefix}delplugin nombre.js\n│ 📌 *Lista:* ${usedPrefix}plugins\n╰─────────────`)
+        if (!text) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗗𝗘𝗟 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
+
+*➤* Uso: *${usedPrefix}delplugin nombre.js*
+*➤* Lista: *${usedPrefix}plugins*
+
+*━━━━━━━━━━*`)
 
         let name = text.endsWith('.js')? text : text + '.js'
         let filePath = path.join(pluginsDir, name)
 
         if (!fs.existsSync(filePath))
-            return m.reply(`❌ *No existe el plugin:* ${name}`)
+            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* No existe el plugin: *${name}*
+
+*━━━━━━━━━━*`)
 
         try {
             fs.unlinkSync(filePath)
             await m.react('✅')
-            m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *PLUGIN ELIMINADO* 」─╮\n│ 🗑️ *Archivo:* ${name}\n╰─────────────\n> *Reinicia el bot para aplicar*`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗗𝗘𝗟 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+
+*━━━━━━━━━━*
+*✅ PLUGIN ELIMINADO*
+
+*🗑️ Archivo:* *${name}*
+
+*━━━━━━━━━━*
+> _Reinicia el bot para aplicar los cambios_`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`❌ Error al eliminar: ${e.message}`)
+            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* Error al eliminar: ${e.message}
+
+*━━━━━━━━━━*`)
         }
     }
 
     // ============ LIST PLUGINS ============
     if (command === 'plugins' || command === 'plist') {
         let files = fs.readdirSync(pluginsDir).filter(file => file.endsWith('.js'))
-        if (files.length === 0) return m.reply('No hay plugins')
-        let list = files.map((v, i) => `│ ${i + 1}. ${v}`).join('\n')
-        m.reply(`𝐃𝐎𝐋𝐈𝐄 𝐁𝐎𝐓. 🩰\n\n╭─「 *LISTA DE PLUGINS* 」─╮\n${list}\n╰─────────────\n> *Total:* ${files.length}`)
+        if (files.length === 0) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*📂 No hay plugins instalados*
+
+*━━━━━━━━━━*`)
+        let list = files.map((v, i) => `*${i + 1}.* ${v}`).join('\n')
+        m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗣𝗟𝗨𝗚𝗜𝗡𝗦* 🐸
+
+*━━━━━━━━━━*
+${list}
+
+*━━━━━━━━━━*
+*Total:* *${files.length}* plugins`)
     }
 }
 
