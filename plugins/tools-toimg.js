@@ -5,7 +5,15 @@ let handler = async (m, { conn }) => {
   let isSticker = q.mtype === 'stickerMessage' || (q.mimetype || '').includes('webp')
 
   if (!isSticker) {
-    return m.reply('✿ Responde a un sticker para convertirlo en imagen.')
+    return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
+
+*➤* Responde a un *sticker* 
+*➤* Ejemplo: Responde al sticker + *toimg*
+
+*━━━━━━━━━━*`)
   }
 
   try {
@@ -17,7 +25,15 @@ let handler = async (m, { conn }) => {
       m.chat,
       {
         image: media,
-        caption: '✿ Sticker convertido a imagen'
+        caption: `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━━━━━━━━━*
+*✅ STICKER CONVERTIDO*
+
+*➤* Tu *sticker* ya es *imagen JPG*
+*➤* Bot: *SAPITO BOT PREM*
+
+*━━━━━━━━━━━━━━━━━━*`
       },
       { quoted: m }
     )
@@ -26,7 +42,16 @@ let handler = async (m, { conn }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply('✿ No pude convertir el sticker.')
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+    m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* No pude convertir el *sticker*
+*➤* Intenta con otro sticker
+
+*━━━━━━━━━━*`)
   }
 
 }
