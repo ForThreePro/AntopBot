@@ -3,11 +3,20 @@ import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
+
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   let q = m.quoted ? m.quoted : m
   let txt = text || q.text || q.caption || q.body || ''
 
-  if (!txt) return m.reply(`🛸 *[ NOX BOT MD ]* 🌌\n\n🚩 *Escribe el texto para generar el sticker Brat.*\n📌 Ejemplo: *${usedPrefix + command} Hola*`)
+  if (!txt) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗕𝗥𝗔𝗧* 🐸
+
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
+
+*➤* Escribe el texto para generar el *sticker Brat*
+*➤* Ejemplo: *${usedPrefix + command} Hola Sapito*
+
+*━━━━━━━━━━*`)
 
   await m.react('🖌️')
 
@@ -17,7 +26,15 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let response = await fetch(apiUrl)
   if (!response.ok) {
     await m.react('❌')
-    return m.reply(`❌ *Error al generar el sticker.*`)
+    return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+
+*━━━━━━━━━━*
+*❌ ERROR*
+
+*➤* Error al generar el *sticker*
+*➤* Intenta de nuevo
+
+*━━━━━━━━━━*`)
   }
 
   let inputBuffer = await response.buffer()
