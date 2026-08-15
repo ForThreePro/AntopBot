@@ -6,22 +6,22 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
 
     // 1. WM / TAKE / ROBAR
     if (command === 'wm' || command === 'take' || command === 'robar') {
-        if (!m.quoted) return error('Responde a un *Sticker*')
+        if (!m.quoted) return error('Responde a un *sticker*')
         let [packname,...author] = text.split('|')
         author = (author || []).join('|')
         let mime = m.quoted.mimetype || ''
-        if (!/webp/.test(mime)) return error('Responde a un *Sticker*')
+        if (!/webp/.test(mime)) return error('Responde a un *sticker*')
         let img = await m.quoted.download()
-        if (!img) return error('Responde a un *Sticker*')
+        if (!img) return error('Responde a un *sticker*')
 
         try {
             let stiker = await addExif(img, packname || '', author || '')
-            await conn.sendFile(m.chat, stiker, 'wm.webp', '', m)
+            await conn.sendFile(m.chat, stiker, 'sapito.webp', '', m)
             await m.react('✅')
         } catch (e) {
             console.error(e)
             await m.react('❌')
-            error('Error al editar el sticker')
+            error('Error al editar el *sticker*')
         }
     }
 
@@ -29,19 +29,19 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     if (command === 's' || command === 'sticker' || command === 'stiker') {
         let q = m.quoted? m.quoted : m
         let mime = (q.msg || q).mimetype || q.mediaType || ''
-        if (!/webp|image|video/g.test(mime)) return error('Responde a una imagen, video o gif')
+        if (!/webp|image|video/g.test(mime)) return error('Responde a una *imagen, video o gif*')
         let img = await q.download()
         let stiker = await sticker(img, false, '', '')
-        await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
+        await conn.sendFile(m.chat, stiker, 'sapito.webp', '', m)
         await m.react('✅')
     }
 
-    // 3. QC / QUOTLY - ARREGLADO
+    // 3. QC / QUOTLY
     if (command === 'qc' || command === 'quotly') {
         let mentionedJid = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : null
         let authorName, txt, pp
 
-        if (!args.length &&!(m.quoted && m.quoted.text)) return error('Ingresa un texto para el sticker quotly\n> Ejemplo:.qc Hola mundo\n> Ejemplo:.qc @user Nombre / Texto\n> Ejemplo:.qc Nombre / Texto')
+        if (!args.length &&!(m.quoted && m.quoted.text)) return error(`Ingresa un texto para el *sticker quotly*\n> Ejemplo: *${usedPrefix}qc Hola mundo*\n> Ejemplo: *${usedPrefix}qc @user Nombre / Texto*\n> Ejemplo: *${usedPrefix}qc Nombre / Texto*`)
 
         if (mentionedJid && args.join(" ").includes("/")) {
             const joined = args.slice(1).join(" ")
@@ -75,8 +75,8 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
             return error('Formato inválido')
         }
 
-        if (!txt) return error('Ingresa un texto para el sticker')
-        if (txt.length > 30) return error('Máximo 30 caracteres')
+        if (!txt) return error('Ingresa un texto para el *sticker*')
+        if (txt.length > 30) return error('Máximo *30 caracteres*')
 
         const obj = {
             "type": "quote", "format": "png", "backgroundColor": "#000", "width": 512, "height": 768, "scale": 2,
@@ -89,7 +89,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
             const stiker = await sticker(buffer, false, '', '')
 
             if (stiker) {
-                await conn.sendFile(m.chat, stiker, 'Quotely.webp', '', m)
+                await conn.sendFile(m.chat, stiker, 'sapitoqc.webp', '', m)
                 await m.react('✅')
             } else {
                 await m.react('❌')
@@ -97,14 +97,14 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         } catch (e) {
             console.error(e)
             await m.react('❌')
-            error('Error al generar el sticker')
+            error('Error al generar el *sticker*')
         }
     }
 
     // 4. EMOJIMIX / MIX
     if (command === 'emojimix' || command === 'mix') {
         let [emoji1, emoji2] = text.split(/[&+\s]+/)
-        if (!emoji1 ||!emoji2) return error(`Uso: ${usedPrefix}emojimix 😃+🔥`)
+        if (!emoji1 ||!emoji2) return error(`Uso: *${usedPrefix}emojimix* 😃+🔥`)
 
         let url = `https://api.evogb.org/tools/emojimix?emoji1=${encodeURIComponent(emoji1)}&emoji2=${encodeURIComponent(emoji2)}&key=sasuke`
         try {
@@ -117,17 +117,16 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     }
 
     function error(msg) {
-        let texto = `
-🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+        let texto = `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗦𝗧𝗜𝗖𝗞𝗘𝗥𝗦* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐄𝐑𝐎𝐑\`\` —˙𖦹.🏆꒷
+*━━━━━━━━━━*
+*❌ ERROR*
 
-──愛 *𝗡𝗢𝗧𝗔* ╏ ⚡
-⚡ ➛ ${msg}
+*➤* ${msg}
 
-━━━━━━━━━━━
-*Owner*: @whois.yallico
-> *"Algo salió mal en la técnica"* 💥`
+*━━━━━━━━━━*
+*Owner:* @whois.yallico
+> _"Algo salió mal"_ 💥`
         m.reply(texto)
     }
 }
