@@ -7,22 +7,24 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let q = m.quoted? m.quoted : m
     let mime = (q.msg || q).mimetype || ''
     let urlTarget = text? text.trim() : ''
-    let start = Date.now() // INICIO DEL TIEMPO
+    let start = Date.now()
 
     if (!urlTarget &&!/image\/(jpe?g|png)/.test(mime)) {
-        return conn.reply(m.chat, `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+        return conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐏𝐫𝐞𝐦\`\` —˙𖦹.⚠️꒷
+*━━━━━━━━━━*
+*⚠️ ERROR DE USO*
 
- ⤷ ┇ 𝗘𝗥𝗥𝗢𝗥 𝗗𝗘 𝗨𝗦𝗢 ：✿ 。
+*Instrucciones:*
+*➤* Responde a una *imagen JPG/PNG*
+*➤* O envia un *link de imagen*
+*➤* Ejemplo: *${usedPrefix + command}*
 
-──愛 *𝗜𝗡𝗦𝗧𝗥𝗨𝗖𝗜𝗢𝗡* ╏ ❄️
-⚠️ ➛ Responde a una imagen o envia un link
-⚠️ ➛ Ejemplo: ${usedPrefix + command}
-⚠️ ➛ Formatos: *JPG / PNG*
+*Formatos:* *JPG | PNG*
 
-━━━━━━━━━━━
-*Owner*: @whois.yallico | *Numero*: +51 927 174 369`, m)
+*━━━━━━━━━━*
+*Owner:* @whois.yallico 
+*WhatsApp:* +51 927 174 369`, m)
     }
 
     await m.react('⏳')
@@ -32,7 +34,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         if (!finalUrl && /image\/(jpe?g|png)/.test(mime)) {
             let imgBuffer = await q.download()
             let ext = mime.split('/')[1] || 'jpg'
-            let filename = 'media-' + crypto.randomBytes(8).toString('hex') + '.' + ext
+            let filename = 'sapito-' + crypto.randomBytes(8).toString('hex') + '.' + ext
 
             let formulario = new FormData()
             formulario.append('file', imgBuffer, { filename, contentType: mime })
@@ -50,18 +52,17 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                 finalUrl = jsonUpload.url
             } else {
                 await m.react('❌')
-                return m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+                return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐏𝐫𝐞𝐦\`\` —˙𖦹.⚠️꒷
+*━━━━━━━━━━*
+*❌ ERROR AL SUBIR*
 
- ⤷ ┇ 𝗘𝗥𝗥𝗢𝗥 𝗗𝗘 𝗦𝗜𝗦𝗧𝗘𝗠𝗔 ：✿ 。
+*➤* No se pudo subir la imagen
+*➤* Detalle: ${jsonUpload?.message || 'Sin respuesta'}
 
-──愛 *𝗗𝗘𝗧𝗔𝗟𝗟𝗘* ╏ ❄️
-⚠️ ➛ Error al subir la imagen
-⚠️ ➛ ${jsonUpload?.message || 'Sin respuesta'}
-
-━━━━━━━━━━━
-*Owner*: @whois.yallico | *Numero*: +51 927 174 369`)
+*━━━━━━━━━━*
+*Owner:* @whois.yallico 
+*WhatsApp:* +51 927 174 369`)
             }
         }
 
@@ -71,37 +72,36 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         if (contentType && contentType.includes("application/json")) {
             let jsonDl = await resDl.json()
             await m.react('❌')
-            return m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐏𝐫𝐞𝐦\`\` —˙𖦹.⚠️꒷
+*━━━━━━━━━━*
+*❌ ERROR DE API*
 
- ⤷ ┇ 𝗘𝗥𝗥𝗢𝗥 𝗗𝗘 𝗔𝗣𝗜 ：✿ 。
+*➤* ${jsonDl.message || 'No se pudo mejorar la imagen'}
 
-──愛 *𝗗𝗘𝗧𝗔𝗟𝗟𝗘* ╏ ❄️
-⚠️ ➛ ${jsonDl.message || 'No se pudo mejorar la imagen'}
-
-━━━━━━━━━━━
-*Owner*: @whois.yallico | *Numero*: +51 927 174 369`)
+*━━━━━━━━━━*
+*Owner:* @whois.yallico 
+*WhatsApp:* +51 927 174 369`)
         }
 
         let buffer = await resDl.buffer()
-        let time = ((Date.now() - start) / 1000).toFixed(2) // CALCULAR TIEMPO
+        let time = ((Date.now() - start) / 1000).toFixed(2)
 
-        let info = `🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+        let info = `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐏𝐫𝐞𝐦\`\` —˙𖦹.✨꒷
+*━━━━━━━━━━*
+*✅ IMAGEN MEJORADA*
 
- ⤷ ┇ 𝗜𝗠𝗔𝗚𝗘𝗡 𝗠𝗘𝗝𝗢𝗥𝗔𝗗𝗔 ：✿ 。
-꒰ ◞⁺⊹ ．Mejora con Ki completada •
+*📊 DATOS*
+*➤ Tiempo:* ${time} segundos
+*➤ Comando:* *${command}*
+*➤ Calidad:* *4K Ultra HD*
+*➤ Bot:* *SAPITO BOT PREM*
 
-  ꒱ ׁ. ᘏ 𝗗𝗔𝗧𝗢𝗦 ׅ 𝆬 ָ֢ ෆ
-✨ ➛ Tiempo: ${time} segundos
-✨ ➛ Comando: ${command}
-✨ ➛ Calidad: *Nivel 4K Super Saiyajin*
-
-━━━━━━━━━━━
-*Owner*: @whois.yallico | *Numero*: +51 927 174 369
-> *"El poder del ki aumenta la resolucion"* ⚡`
+*━━━━━━━━━━━━━━━━━━*
+*Owner:* @whois.yallico 
+*WhatsApp:* +51 927 174 369
+> _"Mejorado con IA por Sapito Bot"_ ✨`
 
         await conn.sendMessage(m.chat, { image: buffer, caption: info }, { quoted: m })
         await m.react('✅')
@@ -109,18 +109,17 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     } catch (e) {
         console.error(e)
         await m.react('❌')
-        m.reply(`🐉 𓆩 𝗦𝗢𝗡 𝗚𝗢𝗞𝗨 𝗣𝗥𝗘𝗠 𓆪 🐉
+        m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐏𝐫𝐞𝐦\`\` —˙𖦹.⚠️꒷
+*━━━━━━━━━━*
+*❌ ERROR DE SISTEMA*
 
- ⤷ ┇ 𝗘𝗥𝗥𝗢𝗥 𝗗𝗘 𝗦𝗜𝗦𝗧𝗘𝗠𝗔 ：✿ 。
+*➤* Error al procesar la imagen
+*➤* Intenta de nuevo en unos segundos
 
-──愛 *𝗔𝗩𝗜𝗦𝗢* ╏ ❄️
-⚠️ ➛ Error de sistema
-⚠️ ➛ Intenta de nuevo en unos segundos
-
-━━━━━━━━━━━
-*Owner*: @whois.yallico | *Numero*: +51 927 174 369`)
+*━━━━━━━━━━*
+*Owner:* @whois.yallico 
+*WhatsApp:* +51 927 174 369`)
     }
 }
 
