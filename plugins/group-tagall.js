@@ -27,7 +27,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
       { prefijo: '91', bandera: '🇮🇳' }, { prefijo: '61', bandera: '🇦🇺' },
       { prefijo: '64', bandera: '🇳🇿' }, { prefijo: '1', bandera: '🇺🇸' },
       { prefijo: '7', bandera: '🇷🇺' }, { prefijo: '63', bandera: '🇵🇭' },
-      { prefijo: '95', bandera: '🇲🇲' }
+      { prefijo: '95', bandera: '🇲' }
     ]
 
     const getCountryFlag = (mem) => {
@@ -53,16 +53,16 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     // Ordenar las banderas según el orden definido
     const orderedFlags = countryFlags.map(c => c.bandera).concat(['🚩'])
 
-    // Texto con diseño SON GOKU PREM
-    let messageText = `🐉 𓆩 𝗜𝗡𝗩𝗢𝗖𝗔𝗖𝗜𝗢𝗡 𝗚𝗘𝗡𝗘𝗥𝗔𝗟 𓆪 🐉
+    // Texto con diseño SAPITO BOT PREM
+    let messageText = `🐸 𓆩 𝗜𝗡𝗩𝗢𝗖𝗔𝗖𝗜𝗢𝗡 𝗚𝗘𝗡𝗘𝗥𝗔𝗟 𓆪 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\` ${groupName} \`\` —˙𖦹.🏆꒷
+.⃟𖥔 ݁. 𖦹˙— \`\` ${groupName} \`\` —˙𖦹.🍃꒷
 
-──愛 *𝗜𝗡𝗙𝗢* ╏ ⚡
-⚡ ➛ *Integrantes:* ${participants.length}
-⚡ ➛ *Mensaje:* ${customMessage}
+──🍃 *𝗜𝗡𝗙𝗢* ╏ 💚
+💚 ➛ *Integrantes:* ${participants.length}
+💚 ➛ *Mensaje:* ${customMessage}
 
-──愛 *𝗠𝗜𝗘𝗠𝗕𝗥𝗢𝗦 𝗣𝗢𝗥 𝗣𝗔𝗜𝗦* ╏ 🌍
+──🍃 *𝗠𝗜𝗘𝗠𝗕𝗥𝗢𝗦 𝗣𝗢𝗥 𝗣𝗔𝗜𝗦* ╏ 🌿
 `
 
     for (const flag of orderedFlags) {
@@ -77,11 +77,11 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 
     messageText += `
 ━━━━━━━━━━━
-*Powered by*: SON GOKU PREM 💥
+*Powered by*: SAPITO BOT PREM 🍃
 *Owner*: @whois.yallico`
 
-    // Imagen a puro link - sin catalogo.png
-    const imageUrl = 'https://files.evogb.win/qS154V.jpg'
+    // NUEVA IMAGEN
+    const imageUrl = 'https://files.evogb.win/FmVWNa.jpg'
 
     await conn.sendMessage(m.chat, {
       image: { url: imageUrl },
