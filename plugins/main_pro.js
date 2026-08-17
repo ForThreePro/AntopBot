@@ -8,27 +8,107 @@ import { tmpdir } from 'os'
 let handler = async (m, { conn, command, text, usedPrefix }) => {
     await m.react('⏳')
 
+    // OWNER
+    if (command === 'owner' || command === 'creator') {
+        let owner = '51927174369@s.whatsapp.net'
+        let texto = `
+🐸 *𓆩 DUEÑO DEL BOT 𓆪* 🐸
+
+.⃟𖥔 ݁. 𖦹˙— *\`\`OWNER\`\`* —˙𖦹.🍃꒷
+
+ *⤷ ┇ INFORMACION* ：✿ 。
+
+──🍃 *CONTACTO* ╏ 💚
+💚 ➛ *Owner:* @${owner.split('@')[0]}
+💚 ➛ *Numero:* +51 927 174 369
+
+──🍃 *NOTA* ╏ 🌿
+🌿 ➛ *Contacta solo para cosas importantes*
+
+━━━━━━━━━━━
+*Owner*: @51927174369
+> *"El sapito mayor está disponible"* 🍃`
+        await m.react('✅')
+        return conn.sendMessage(m.chat, {
+            image: { url: 'https://files.evogb.win/FmVWNa.jpg' },
+            caption: texto,
+            mentions: [owner]
+        })
+    }
+
+    // PING
+    if (command === 'ping' || command === 'p') {
+        let start = new Date * 1
+        await conn.reply(m.chat, '🐸 *Calculando...*', m)
+        let end = new Date * 1
+        let speed = end - start
+        let texto = `
+🐸 *𓆩 PING DEL SAPITO 𓆪* 🐸
+
+.⃟𖥔 ݁. 𖦹˙— *\`\`VELOCIDAD\`\`* —˙𖦹.🍃꒷
+
+ *⤷ ┇ ESTADO* ：✿ 。
+
+──🍃 *ESTADISTICAS* ╏ 💚
+💚 ➛ *Velocidad:* ${speed}ms
+💚 ➛ *Estado:* Activo y saltando
+
+──🍃 *NOTA* ╏ 🌿
+🌿 ➛ *Servidor estable*
+
+━━━━━━━━━━━
+*Owner*: @51927174369
+> *"Respondo más rápido que un salto"* 🍃`
+        await m.react('✅')
+        return conn.sendMessage(m.chat, {
+            image: { url: 'https://files.evogb.win/FmVWNa.jpg' },
+            caption: texto
+        }, { quoted: m })
+    }
+
+    // GRUPOS
+    if (command === 'grupos' || command === 'listagrupos') {
+        let chats = Object.entries(conn.chats).filter(([jid, chat]) => jid.endsWith('@g.us') && chat.isChats)
+        let texto = `🐸 *𓆩 GRUPOS DEL SAPITO 𓆪* 🐸\n\n.⃟𖥔 ݁. 𖦹˙— *\`\`LISTA\`\`* —˙𖦹.🍃꒷\n\n *⤷ ┇ TOTAL:* ${chats.length} grupos\n\n`
+
+        let i = 1
+        for (let [jid, chat] of chats) {
+            let metadata = await conn.groupMetadata(jid).catch(_ => null)
+            texto += `*${i}.* *${metadata?.subject || 'Sin nombre'}*\n🔗 https://chat.whatsapp.com/${await conn.groupInviteCode(jid).catch(_ => 'privado')}\n\n`
+            i++
+        }
+
+        texto += `━━━━━━━━━━━\n*Owner*: @51927174369\n> *"Saltando en ${chats.length} charcos"* 🍃`
+
+        await m.react('✅')
+        return conn.sendMessage(m.chat, {
+            image: { url: 'https://files.evogb.win/FmVWNa.jpg' },
+            caption: texto,
+            mentions: conn.parseMention(texto)
+        })
+    }
+
     if (command === 'cleartmp') {
         const tmpPath = './tmp'
         if (fs.existsSync(tmpPath)) {
             fs.readdirSync(tmpPath).forEach(file => fs.unlinkSync(`${tmpPath}/${file}`))
         }
         let texto = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐋𝐈𝐌𝐏𝐈𝐄𝐙𝐀\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— *\`\`LIMPIEZA\`\`* —˙𖦹.🍃꒷
 
- ⤷ ┇ 𝗖𝗔𝗖𝗛𝗘 𝗣𝗨𝗥𝗜𝗙𝗜𝗖𝗔𝗗𝗢 ：✿ 。
+ *⤷ ┇ CACHE PURIFICADO* ：✿ 。
 
-──🍃 *𝗥𝗘𝗦𝗨𝗟𝗧𝗔𝗗𝗢* ╏ 💚
-💚 ➛ Caché temporal eliminado
-💚 ➛ Memoria liberada con éxito
+──🍃 *RESULTADO* ╏ 💚
+💚 ➛ *Caché temporal eliminado*
+💚 ➛ *Memoria liberada con éxito*
 
-──🍃 *𝗡𝗢𝗧𝗔* ╏ 🌿
-🌿 ➛ El bot está más ligero
+──🍃 *NOTA* ╏ 🌿
+🌿 ➛ *El bot está más ligero*
 
 ━━━━━━━━━━━
-*Owner*: @whois.yallico
+*Owner*: @51927174369
 > *"He limpiado el charco para saltar mejor"* 🍃`
         await m.react('✅')
         return m.reply(texto)
@@ -37,20 +117,20 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
     if (command === 'cpu') {
         let cpu = os.loadavg()[0].toFixed(2)
         let texto = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐂𝐏𝐔\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— *\`\`CPU\`\`* —˙𖦹.🍃꒷
 
- ⤷ ┇ 𝗘𝗦𝗧𝗔𝗗𝗢 𝗗𝗘𝗟 𝗣𝗥𝗢𝗖𝗘𝗦𝗔𝗗𝗢𝗥 ：✿ 。
+ *⤷ ┇ ESTADO DEL PROCESADOR* ：✿ 。
 
-──🍃 *𝗘𝗦𝗧𝗔𝗗𝗜𝗦𝗧𝗜𝗖𝗔𝗦* ╏ 💚
-💚 ➛ Carga CPU: ${cpu}%
+──🍃 *ESTADISTICAS* ╏ 💚
+💚 ➛ *Carga CPU:* ${cpu}%
 
-──🍃 *𝗡𝗢𝗧𝗔* ╏ 🌿
-🌿 ➛ Si supera 90% el bot va lento
+──🍃 *NOTA* ╏ 🌿
+🌿 ➛ *Si supera 90% el bot va lento*
 
 ━━━━━━━━━━━
-*Owner*: @whois.yallico
+*Owner*: @51927174369
 > *"Mis saltos están al ${cpu}% de energía"* 🍃`
         await m.react('✅')
         return m.reply(texto)
@@ -60,20 +140,20 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         const used = process.memoryUsage()
         let ram = (used.heapUsed / 1024 / 1024).toFixed(2)
         let texto = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐑𝐀𝐌\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— *\`\`RAM\`\`* —˙𖦹.🍃꒷
 
- ⤷ ┇ 𝗠𝗘𝗠𝗢𝗥𝗜𝗔 𝗘𝗡 𝗨𝗦𝗢 ：✿ 。
+ *⤷ ┇ MEMORIA EN USO* ：✿ 。
 
-──🍃 *𝗘𝗦𝗧𝗔𝗗𝗜𝗦𝗧𝗜𝗖𝗔𝗦* ╏ 💚
-💚 ➛ Consumo RAM: ${ram} MB
+──🍃 *ESTADISTICAS* ╏ 💚
+💚 ➛ *Consumo RAM:* ${ram} MB
 
-──🍃 *𝗡𝗢𝗧𝗔* ╏ 🌿
-🌿 ➛ Memoria usada por el proceso
+──🍃 *NOTA* ╏ 🌿
+🌿 ➛ *Memoria usada por el proceso*
 
 ━━━━━━━━━━━
-*Owner*: @whois.yallico
+*Owner*: @51927174369
 > *"Tengo suficiente energía para seguir saltando"* 🍃`
         await m.react('✅')
         return m.reply(texto)
@@ -83,20 +163,20 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         let _uptime = process.uptime() * 1000
         let uptime = clockString(_uptime)
         let texto = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐔𝐏𝐓𝐈𝐌𝐄\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— *\`\`UPTIME\`\`* —˙𖦹.🍃꒷
 
- ⤷ ┇ 𝗧𝗜𝗘𝗠𝗣𝗢 𝗔𝗖𝗧𝗜𝗩𝗢 ：✿ 。
+ *⤷ ┇ TIEMPO ACTIVO* ：✿ 。
 
-──🍃 *𝗘𝗦𝗧𝗔𝗗𝗜𝗦𝗧𝗜𝗖𝗔𝗦* ╏ 💚
-💚 ➛ Tiempo activo: ${uptime}
+──🍃 *ESTADISTICAS* ╏ 💚
+💚 ➛ *Tiempo activo:* ${uptime}
 
-──🍃 *𝗡𝗢𝗧𝗔* ╏ 🌿
-🌿 ➛ Desde que se inició el bot
+──🍃 *NOTA* ╏ 🌿
+🌿 ➛ *Desde que se inició el bot*
 
 ━━━━━━━━━━━
-*Owner*: @whois.yallico
+*Owner*: @51927174369
 > *"Llevo croando ${uptime} sin parar"* 🍃`
         await m.react('✅')
         return m.reply(texto)
@@ -110,23 +190,23 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         let ram = (used.heapUsed / 1024 / 1024).toFixed(2)
 
         let texto = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐑𝐄𝐏𝐎𝐑𝐓𝐄 𝐃𝐄 𝐒𝐈𝐒𝐓𝐄𝐌𝐀\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— *\`\`REPORTE DE SISTEMA\`\`* —˙𖦹.🍃꒷
 
- ⤷ ┇ 𝗘𝗦𝗧𝗔𝗗𝗢 𝗖𝗢𝗠𝗣𝗟𝗘𝗧𝗢 𝗗𝗘𝗟 𝗕𝗢𝗧 ：✿ 。
+ *⤷ ┇ ESTADO COMPLETO DEL BOT* ：✿ 。
 
-──🍃 *𝗘𝗦𝗧𝗔𝗗𝗜𝗦𝗧𝗜𝗖𝗔𝗦* ╏ 💚
-💚 ➛ Uptime: ${muptime}
-💚 ➛ Memoria RAM: ${ram} MB
-💚 ➛ Carga CPU: ${cpu}%
+──🍃 *ESTADISTICAS* ╏ 💚
+💚 ➛ *Uptime:* ${muptime}
+💚 ➛ *Memoria RAM:* ${ram} MB
+💚 ➛ *Carga CPU:* ${cpu}%
 
-──🍃 *𝗗𝗘𝗧𝗔𝗟𝗘𝗦* ╏ 🌿
-🌿 ➛ Desarrollado por: Sebastián Barboza
-🌿 ➛ Estado: Operativo
+──🍃 *DETALLES* ╏ 🌿
+🌿 ➛ *Desarrollado por:* Sebastián Barboza
+🌿 ➛ *Estado:* Operativo
 
 ━━━━━━━━━━━
-*Owner*: @whois.yallico
+*Owner*: @51927174369
 > *"Todos mis sistemas están al 100% croac"* 🍃`
         await m.react('✅')
         return m.reply(texto)
@@ -138,21 +218,21 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
         if (!txt) {
             let texto = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐄𝐑𝐎𝐑\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— *\`\`ERROR\`\`* —˙𖦹.🍃꒷
 
- ⤷ ┇ 𝗙𝗔𝗟𝗧𝗔 𝗧𝗘𝗫𝗧𝗢 ：✿ 。
+ *⤷ ┇ FALTA TEXTO* ：✿ 。
 
-──🍃 *𝗨𝗦𝗢* ╏ 💚
-💚 ➛ Escribe el texto que deseas convertir a audio
-💚 ➛ O responde a un mensaje
+──🍃 *USO* ╏ 💚
+💚 ➛ *Escribe el texto que deseas convertir a audio*
+💚 ➛ *O responde a un mensaje*
 
-──🍃 *𝗘𝗝𝗘𝗠𝗣𝗟𝗢* ╏ 🌿
+──🍃 *EJEMPLO* ╏ 🌿
 🌿 ➛ ${usedPrefix}tts Hola, ¿cómo estás?
 
 ━━━━━━━━━━━
-*Owner*: @whois.yallico
+*Owner*: @51927174369
 > *"Necesito escuchar tu croar guerrero"* 🍃`
             await m.react('❌')
             return m.reply(texto)
@@ -172,37 +252,19 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-              .audioCodec('libopus')
-              .toFormat('opus')
-              .outputOptions([
+            .audioCodec('libopus')
+            .toFormat('opus')
+            .outputOptions([
                     '-avoid_negative_ts make_zero',
                     '-ac 1',
                     '-b:a 64k'
                 ])
-              .on('end', () => resolve(true))
-              .on('error', (err) => reject(err))
-              .save(tmpFilePath)
+            .on('end', () => resolve(true))
+            .on('error', (err) => reject(err))
+            .save(tmpFilePath)
         })
 
         let audioBuffer = fs.readFileSync(tmpFilePath)
-
-        let caption = `
-🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
-
-.⃟𖥔 ݁. 𖦹˙— \`\`𝐓𝐄𝐗𝐓 𝐓𝐎 𝐒𝐏𝐄𝐂𝐇\`\` —˙𖦹.🍃꒷
-
- ⤷ ┇ 𝗔𝗨𝗗𝗜𝗢 𝗚𝗘𝗡𝗘𝗥𝗔𝗗𝗢 ：✿ 。
-
-──🍃 *𝗜𝗡𝗙𝗢* ╏ 💚
-💚 ➛ Idioma: Español
-💚 ➛ Voz: Google TTS
-
-──🍃 *𝗧𝗘𝗫𝗧𝗢* ╏ 🌿
-🌿 ➛ "${txt}"
-
-━━━━━━━━━━━
-*Owner*: @whois.yallico
-> *"He convertido tu croar en sonido"* 🍃`
 
         await conn.sendMessage(m.chat, {
             audio: audioBuffer,
@@ -223,9 +285,9 @@ function clockString(ms) {
     return `${d}d ${h}h ${m}m ${s}s`
 }
 
-handler.help = ['cleartmp', 'cpu', 'ram', 'uptime', 'info', 'tts <texto>']
-handler.tags = ['main', 'tools']
-handler.command = /^(cleartmp|cpu|ram|uptime|info|g?tts|ttss)$/i
-handler.rowner = true
+handler.help = ['owner', 'ping', 'grupos', 'cleartmp', 'cpu', 'ram', 'uptime', 'info', 'tts <texto>']
+handler.tags = ['main', 'tools', 'info']
+handler.command = /^(owner|creator|ping|p|grupos|listagrupos|cleartmp|cpu|ram|uptime|info|g?tts|ttss)$/i
+handler.rowner = false // owner y ping para todos. grupos solo owner
 
 export default handler
