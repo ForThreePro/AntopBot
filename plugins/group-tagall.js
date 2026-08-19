@@ -1,20 +1,8 @@
-const handler = async (m, { isOwner, isAdmin, isBotAdmin, conn, participants, args }) => {
+const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
   try {
     if (!(isAdmin || isOwner)) {
       global.dfail('admin', m, conn);
       return;
-    }
-
-    if (!isBotAdmin) {
-      return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
-
-*━━━━━━━━━━*
-*❌ NECESITO SER ADMIN*
-
-*➤* Dame admin para poder invocar a todos
-*➤* Usa: *.autoadmin*
-
-*━━━━━━━━━━*`)
     }
 
     const customMessage = args.join(' ') || '📢 INVOCACIÓN GENERAL'
@@ -92,7 +80,7 @@ const handler = async (m, { isOwner, isAdmin, isBotAdmin, conn, participants, ar
 *Powered by*: ***Garfield Bot Oficial*** 🍕
 *Owner*: @whois.yallico`
 
-    // NUEVAS IMAGENES ROTATORIAS
+    // IMAGENES ROTATORIAS
     const images = [
       'https://files.evogb.win/QFXQtu.jpg',
       'https://files.evogb.win/E2yVdA.jpg'
