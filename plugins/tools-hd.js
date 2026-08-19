@@ -10,7 +10,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let start = Date.now()
 
     if (!urlTarget &&!/image\/(jpe?g|png)/.test(mime)) {
-        return conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
+        return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
@@ -34,7 +34,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         if (!finalUrl && /image\/(jpe?g|png)/.test(mime)) {
             let imgBuffer = await q.download()
             let ext = mime.split('/')[1] || 'jpg'
-            let filename = 'sapito-' + crypto.randomBytes(8).toString('hex') + '.' + ext
+            let filename = 'garfield-' + crypto.randomBytes(8).toString('hex') + '.' + ext
 
             let formulario = new FormData()
             formulario.append('file', imgBuffer, { filename, contentType: mime })
@@ -52,7 +52,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                 finalUrl = jsonUpload.url
             } else {
                 await m.react('❌')
-                return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
+                return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR AL SUBIR*
@@ -72,7 +72,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         if (contentType && contentType.includes("application/json")) {
             let jsonDl = await resDl.json()
             await m.react('❌')
-            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
+            return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR DE API*
@@ -87,7 +87,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let buffer = await resDl.buffer()
         let time = ((Date.now() - start) / 1000).toFixed(2)
 
-        let info = `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
+        let info = `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
 
 *━━━━━━━━━━*
 *✅ IMAGEN MEJORADA*
@@ -96,12 +96,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 *➤ Tiempo:* ${time} segundos
 *➤ Comando:* *${command}*
 *➤ Calidad:* *4K Ultra HD*
-*➤ Bot:* *SAPITO BOT PREM*
+*➤ Bot:* ***Garfield Bot Oficial***
 
-*━━━━━━━━━━━━━━━━━━*
+*━━━━━━━━━━*
 *Owner:* @whois.yallico 
 *WhatsApp:* +51 927 174 369
-> _"Mejorado con IA por Sapito Bot"_ ✨`
+> _"Mejorado con IA por Garfield Bot"_ ✨`
 
         await conn.sendMessage(m.chat, { image: buffer, caption: info }, { quoted: m })
         await m.react('✅')
@@ -109,7 +109,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     } catch (e) {
         console.error(e)
         await m.react('❌')
-        m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗛𝗗* 🐸
+        m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR DE SISTEMA*
