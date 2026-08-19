@@ -119,6 +119,5 @@ handler.tags = ['grupos']
 handler.command = /^(todos|invocar|tagall)$/i
 handler.admin = true
 handler.group = true
-handler.botAdmin = true
 
 export default handler
