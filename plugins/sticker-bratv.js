@@ -2,13 +2,13 @@ import axios from 'axios'
 import { sticker } from '../lib/sticker.js'
 
 let handler = async (m, { conn, args }) => {
-  if (!args[0]) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗕𝗥𝗔𝗧 𝗩𝗜𝗗𝗘𝗢* 🐸
+  if (!args[0]) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗕𝗥𝗔𝗧 𝗩𝗜𝗗𝗘𝗢* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
 
 *➤* Ingresa el texto para el *vídeo*
-*➤* Ejemplo: *bratv hola sapito*
+*➤* Ejemplo: *bratv hola garfield*
 
 *━━━━━━━━━━*`)
 
@@ -18,10 +18,10 @@ let handler = async (m, { conn, args }) => {
     const res = await axios.get(apiUrl, { responseType: 'arraybuffer' })
     const buffer = Buffer.from(res.data, 'binary')
 
-    // Convertir a sticker sin wm, sin nada
-    const stiker = await sticker(buffer, false, '', '')
+    // Convertir a sticker con wm de Garfield
+    const stiker = await sticker(buffer, false, '***Garfield Bot Oficial***', '')
 
-    if (!stiker) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+    if (!stiker) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -36,7 +36,7 @@ let handler = async (m, { conn, args }) => {
   } catch (e) {
     console.error(e)
     await m.react('❌')
-    return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+    return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR DE SISTEMA*
