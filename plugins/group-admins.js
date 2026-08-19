@@ -1,6 +1,6 @@
 const handler = async (m, { conn, command }) => {
   if (!m.mentionedJid[0] &&!m.quoted) {
-    let texto = `🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+    let texto = `🐱 𓆩 ***𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𓆪 🐱
 
 *Uso:*
 .${command} @user → Para ${command === 'promote' || command === 'promover' || command === 'daradmin'? 'promover' : 'degradar'}
@@ -14,24 +14,24 @@ const handler = async (m, { conn, command }) => {
   let action = command === 'promote' || command === 'promover' || command === 'daradmin'? 'promote' : 'demote'
 
   let msgAccion = action === 'promote'
-  ? `🐸 𓆩 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗣𝗥𝗢𝗠𝗢𝗩𝗜𝗗𝗢 𓆪 🐸
+ ? `🐱 𓆩 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗣𝗥𝗢𝗠𝗢𝗩𝗜𝗗𝗢 𓆪 🐱
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROMOTE\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`PROMOTE\`\` —˙𖦹.🍕꒷
 
 👑 *Nuevo Admin:* @${user.split('@')[0]}
-💚 *Por:* @${m.sender.split('@')[0]}
+😼 *Por:* @${m.sender.split('@')[0]}
 
 ━━━━━━━━━━━
-*Powered by*: SAPITO BOT PREM 🍃`
-    : `🐸 𓆩 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗗𝗘𝗚𝗥𝗔𝗗𝗔𝗗𝗢 𓆪 🐸
+*Powered by*: ***Garfield Bot Oficial*** 🍕`
+    : `🐱 𓆩 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 𝗗𝗘𝗚𝗥𝗔𝗗𝗔𝗗𝗢 𓆪 🐱
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DEMOTE\`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`DEMOTE\`\` —˙𖦹.🍕꒷
 
-👢 *Ya no es Admin:* @${user.split('@')[0]}
-🌿 *Por:* @${m.sender.split('@')[0]}
+📉 *Ya no es Admin:* @${user.split('@')[0]}
+🍕 *Por:* @${m.sender.split('@')[0]}
 
 ━━━━━━━━━━━
-*Powered by*: SAPITO BOT PREM 🍃`
+*Powered by*: ***Garfield Bot Oficial*** 🍕`
 
   await m.react(action === 'promote'? '👑' : '📉')
   await conn.groupParticipantsUpdate(m.chat, [user], action)
