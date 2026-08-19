@@ -12,7 +12,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
     if (command === 'owner' || command === 'creator') {
         let owner = '51927174369@s.whatsapp.net'
         let texto = `
-🐸 *𓆩 DUEÑO DEL BOT 𓆪* 🐸
+🐱 *𓆩 DUEÑO DEL BOT 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`OWNER\`\`* —˙𖦹.🍃꒷
 
@@ -27,10 +27,18 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"El sapito mayor está disponible"* 🍃`
+> *"Garfield está disponible para la lasaña"* 🍕`
+
+        // Rota las 2 fotos
+        const images = [
+            'https://files.evogb.win/QFXQtu.jpg',
+            'https://files.evogb.win/E2yVdA.jpg'
+        ]
+        let img = { url: images[Math.floor(Math.random() * images.length)] }
+
         await m.react('✅')
         return conn.sendMessage(m.chat, {
-            image: { url: 'https://files.evogb.win/FmVWNa.jpg' },
+            image: img,
             caption: texto,
             mentions: [owner]
         })
@@ -39,11 +47,11 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
     // PING
     if (command === 'ping' || command === 'p') {
         let start = new Date * 1
-        await conn.reply(m.chat, '🐸 *Calculando...*', m)
+        await conn.reply(m.chat, '🐱 *Calculando...*', m)
         let end = new Date * 1
         let speed = end - start
         let texto = `
-🐸 *𓆩 PING DEL SAPITO 𓆪* 🐸
+🐱 *𓆩 PING DE GARFIELD 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`VELOCIDAD\`\`* —˙𖦹.🍃꒷
 
@@ -51,41 +59,26 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ──🍃 *ESTADISTICAS* ╏ 💚
 💚 ➛ *Velocidad:* ${speed}ms
-💚 ➛ *Estado:* Activo y saltando
+💚 ➛ *Estado:* Activo y durmiendo
 
 ──🍃 *NOTA* ╏ 🌿
 🌿 ➛ *Servidor estable*
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"Respondo más rápido que un salto"* 🍃`
+> *"Respondo más rápido que un bostezo"* 🍃`
+
+        const images = [
+            'https://files.evogb.win/QFXQtu.jpg',
+            'https://files.evogb.win/E2yVdA.jpg'
+        ]
+        let img = { url: images[Math.floor(Math.random() * images.length)] }
+
         await m.react('✅')
         return conn.sendMessage(m.chat, {
-            image: { url: 'https://files.evogb.win/FmVWNa.jpg' },
+            image: img,
             caption: texto
         }, { quoted: m })
-    }
-
-    // GRUPOS
-    if (command === 'grupos' || command === 'listagrupos') {
-        let chats = Object.entries(conn.chats).filter(([jid, chat]) => jid.endsWith('@g.us') && chat.isChats)
-        let texto = `🐸 *𓆩 GRUPOS DEL SAPITO 𓆪* 🐸\n\n.⃟𖥔 ݁. 𖦹˙— *\`\`LISTA\`\`* —˙𖦹.🍃꒷\n\n *⤷ ┇ TOTAL:* ${chats.length} grupos\n\n`
-
-        let i = 1
-        for (let [jid, chat] of chats) {
-            let metadata = await conn.groupMetadata(jid).catch(_ => null)
-            texto += `*${i}.* *${metadata?.subject || 'Sin nombre'}*\n🔗 https://chat.whatsapp.com/${await conn.groupInviteCode(jid).catch(_ => 'privado')}\n\n`
-            i++
-        }
-
-        texto += `━━━━━━━━━━━\n*Owner*: @51927174369\n> *"Saltando en ${chats.length} charcos"* 🍃`
-
-        await m.react('✅')
-        return conn.sendMessage(m.chat, {
-            image: { url: 'https://files.evogb.win/FmVWNa.jpg' },
-            caption: texto,
-            mentions: conn.parseMention(texto)
-        })
     }
 
     if (command === 'cleartmp') {
@@ -94,7 +87,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
             fs.readdirSync(tmpPath).forEach(file => fs.unlinkSync(`${tmpPath}/${file}`))
         }
         let texto = `
-🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
+🐱 *𓆩 ***Garfield Bot Oficial*** 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`LIMPIEZA\`\`* —˙𖦹.🍃꒷
 
@@ -109,7 +102,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"He limpiado el charco para saltar mejor"* 🍃`
+> *"He limpiado mi cama para dormir mejor"* 🍕`
         await m.react('✅')
         return m.reply(texto)
     }
@@ -117,7 +110,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
     if (command === 'cpu') {
         let cpu = os.loadavg()[0].toFixed(2)
         let texto = `
-🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
+🐱 *𓆩 ***Garfield Bot Oficial*** 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`CPU\`\`* —˙𖦹.🍃꒷
 
@@ -131,7 +124,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"Mis saltos están al ${cpu}% de energía"* 🍃`
+> *"Mi energía está al ${cpu}% para comer lasaña"* 🍕`
         await m.react('✅')
         return m.reply(texto)
     }
@@ -140,7 +133,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         const used = process.memoryUsage()
         let ram = (used.heapUsed / 1024 / 1024).toFixed(2)
         let texto = `
-🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
+🐱 *𓆩 ***Garfield Bot Oficial*** 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`RAM\`\`* —˙𖦹.🍃꒷
 
@@ -154,7 +147,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"Tengo suficiente energía para seguir saltando"* 🍃`
+> *"Tengo suficiente RAM para seguir durmiendo"* 🍕`
         await m.react('✅')
         return m.reply(texto)
     }
@@ -163,7 +156,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         let _uptime = process.uptime() * 1000
         let uptime = clockString(_uptime)
         let texto = `
-🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
+🐱 *𓆩 ***Garfield Bot Oficial*** 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`UPTIME\`\`* —˙𖦹.🍃꒷
 
@@ -177,7 +170,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"Llevo croando ${uptime} sin parar"* 🍃`
+> *"Llevo ronroneando ${uptime} sin parar"* 🍕`
         await m.react('✅')
         return m.reply(texto)
     }
@@ -190,7 +183,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         let ram = (used.heapUsed / 1024 / 1024).toFixed(2)
 
         let texto = `
-🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
+🐱 *𓆩 ***Garfield Bot Oficial*** 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`REPORTE DE SISTEMA\`\`* —˙𖦹.🍃꒷
 
@@ -207,7 +200,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"Todos mis sistemas están al 100% croac"* 🍃`
+> *"Todos mis sistemas están al 100% para la siesta"* 🍕`
         await m.react('✅')
         return m.reply(texto)
     }
@@ -218,7 +211,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
         if (!txt) {
             let texto = `
-🐸 *𓆩 SAPITO BOT PREM 𓆪* 🐸
+🐱 *𓆩 ***Garfield Bot Oficial*** 𓆪* 🐱
 
 .⃟𖥔 ݁. 𖦹˙— *\`\`ERROR\`\`* —˙𖦹.🍃꒷
 
@@ -233,7 +226,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ━━━━━━━━━━━
 *Owner*: @51927174369
-> *"Necesito escuchar tu croar guerrero"* 🍃`
+> *"Necesito escuchar tu maullido guerrero"* 🍕`
             await m.react('❌')
             return m.reply(texto)
         }
@@ -248,20 +241,20 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
             timeout: 10000,
         })
 
-        let tmpFilePath = path.join(tmpdir(), `${Date.now()}.opus`)
+        let tmpFilePath = path.join(tmpdir(), `garfield-${Date.now()}.opus`)
 
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-            .audioCodec('libopus')
-            .toFormat('opus')
-            .outputOptions([
+           .audioCodec('libopus')
+           .toFormat('opus')
+           .outputOptions([
                     '-avoid_negative_ts make_zero',
                     '-ac 1',
                     '-b:a 64k'
                 ])
-            .on('end', () => resolve(true))
-            .on('error', (err) => reject(err))
-            .save(tmpFilePath)
+           .on('end', () => resolve(true))
+           .on('error', (err) => reject(err))
+           .save(tmpFilePath)
         })
 
         let audioBuffer = fs.readFileSync(tmpFilePath)
@@ -285,9 +278,9 @@ function clockString(ms) {
     return `${d}d ${h}h ${m}m ${s}s`
 }
 
-handler.help = ['owner', 'ping', 'grupos', 'cleartmp', 'cpu', 'ram', 'uptime', 'info', 'tts <texto>']
+handler.help = ['owner', 'ping', 'cleartmp', 'cpu', 'ram', 'uptime', 'info', 'tts <texto>']
 handler.tags = ['main', 'tools', 'info']
-handler.command = /^(owner|creator|ping|p|grupos|listagrupos|cleartmp|cpu|ram|uptime|info|g?tts|ttss)$/i
-handler.rowner = false // owner y ping para todos. grupos solo owner
+handler.command = /^(owner|creator|ping|p|cleartmp|cpu|ram|uptime|info|g?tts|ttss)$/i
+handler.rowner = false
 
 export default handler
