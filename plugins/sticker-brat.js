@@ -8,13 +8,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let q = m.quoted ? m.quoted : m
   let txt = text || q.text || q.caption || q.body || ''
 
-  if (!txt) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗕𝗥𝗔𝗧* 🐸
+  if (!txt) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗕𝗥𝗔𝗧* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
 
 *➤* Escribe el texto para generar el *sticker Brat*
-*➤* Ejemplo: *${usedPrefix + command} Hola Sapito*
+*➤* Ejemplo: *${usedPrefix + command} Hola Garfield*
 
 *━━━━━━━━━━*`)
 
@@ -26,7 +26,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let response = await fetch(apiUrl)
   if (!response.ok) {
     await m.react('❌')
-    return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+    return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -39,8 +39,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   let inputBuffer = await response.buffer()
   let ext = isAnimated ? 'mp4' : 'png'
-  let tmpInput = path.join(tmpdir(), `${Date.now()}.${ext}`)
-  let tmpOutput = path.join(tmpdir(), `${Date.now()}.webp`)
+  let tmpInput = path.join(tmpdir(), `garfield-${Date.now()}.${ext}`)
+  let tmpOutput = path.join(tmpdir(), `garfield-${Date.now()}.webp`)
 
   fs.writeFileSync(tmpInput, inputBuffer)
 
@@ -66,7 +66,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let stickerBuffer = fs.readFileSync(tmpOutput)
 
   await conn.sendMessage(m.chat, {
-    sticker: stickerBuffer
+    sticker: stickerBuffer,
+    packname: '***Garfield Bot Oficial***',
+    author: ''
   }, { quoted: m })
 
   if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
