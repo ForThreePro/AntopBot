@@ -1,30 +1,37 @@
-import axios from 'axios'
 import { sticker } from '../lib/sticker.js'
+import axios from 'axios'
 
-let handler = async (m, { conn, args }) => {
-  if (!args[0]) return m.reply("《✧》 Ingresa el texto para el vídeo.")
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-  try {
-    const apiUrl = `${global.api.url2}/canvas/bratvideo?text=${encodeURIComponent(args.join(" "))}`
-    const res = await axios.get(apiUrl, { responseType: 'arraybuffer' })
-    const buffer = Buffer.from(res.data, 'binary')
-
-    // Convertir a sticker sin wm, sin nada
-    const stiker = await sticker(buffer, false, '', '')
-
-    if (!stiker) return m.reply('《✧》 No se pudo convertir el vídeo en sticker.')
-
-    await conn.sendMessage(m.chat, { sticker: stiker }, { quoted: m })
-
-  } catch (e) {
-    console.error(e)
-    return m.reply('《✧》 Error al generar el vídeo.')
-  }
+const fetchStickerVideo = async (text) => {
+const response = await axios.get(`https://skyzxu-brat.hf.space/brat-animated`, { params: { text }, responseType: 'arraybuffer' })
+if (!response.data) throw new Error('🍕 error al obtener el video de la api.')
+return response.data
 }
 
+const handler = async (m, { conn, text }) => {
+try {
+let userId = m.sender
+let packstickers = global.db.data.users[userId] || {}
+let texto1 = packstickers.text1 || global.packsticker
+let texto2 = packstickers.text2 || global.packsticker2
+
+text = m.quoted?.text || text
+if (!text) return conn.sendMessage(m.chat, { text: `🐱 𓆩 ***𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𓆪 🐱\n\n🍕 *responde a un mensaje o ingresa un texto para crear el sticker*` }, { quoted: m })
+
+await m.react('🕒')
+const videoBuffer = await fetchStickerVideo(text)
+const stickerBuffer = await sticker(videoBuffer, null, texto1, texto2)
+await conn.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: m })
+await m.react('✅')
+
+} catch (e) {
+await m.react('❌')
+conn.sendMessage(m.chat, { text: `🐱 𓆩 ***𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𓆪 🐱\n\n😿 *se ha producido un problema*\n┆ usa *report* para informarlo.\n\n*Detalle:* ${e.message}` }, { quoted: m })
+}}
+
+handler.tags = ['sticker']
 handler.help = ['bratv']
-handler.tags = ['tools']
 handler.command = ['bratv']
-handler.limit = true
 
 export default handler
