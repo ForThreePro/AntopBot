@@ -1,7 +1,5 @@
 import { WAMessageStubType } from '@whiskeysockets/baileys'
 
-const IMG_GARFIELD = 'https://files.evogb.win/E2yVdA.jpg'
-
 const handler = async (m, { conn, args, isAdmin, isOwner }) => {
   if (!isAdmin &&!isOwner) return conn.reply(m.chat, `🐱 𓆩 ***𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𓆪 🐱\n\n🍕 *Solo admins pueden usar este comando*`, m)
   let chat = global.db.data.chats[m.chat]
@@ -37,7 +35,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
     try {
       pp = await conn.profilePictureUrl(userJid, 'image')
     } catch {
-      pp = IMG_GARFIELD // TU FOTO GARFIELD FALLBACK
+      pp = 'https://files.evogb.win/E2yVdA.jpg' // URL GARFIELD FALLBACK
     }
 
     const userTag = `@${userJid.split('@')[0]}`
