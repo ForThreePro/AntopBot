@@ -8,7 +8,7 @@ const pluginsDir = path.join(__dirname, '../plugins')
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!global.owner.some(([number]) => number === m.sender.split('@')[0]))
-        return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗢𝗪𝗡𝗘𝗥* 🐸
+        return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗢𝗪𝗡𝗘𝗥* 🐱
 
 *━━━━━━━━━━*
 *❌ ACCESO DENEGADO*
@@ -19,7 +19,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     // ============ ADD PLUGIN ============
     if (command === 'addplugin' || command === 'añadir') {
-        if (!m.quoted) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗔𝗗𝗗 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+        if (!m.quoted) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗔𝗗𝗗 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
@@ -37,7 +37,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             let media = await m.quoted.download()
             fs.writeFileSync(filePath, media)
             await m.react('✅')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗔𝗗 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗔𝗗 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *✅ PLUGIN AÑADIDO*
@@ -49,7 +49,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 > _Reinicia el bot para aplicar los cambios_`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -63,7 +63,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     // ============ EDIT PLUGIN ============
     if (command === 'editplugin' || command === 'editar') {
         let name = text
-        if (!name) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗘𝗗𝗜𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+        if (!name) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗘𝗗𝗜𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
@@ -77,7 +77,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let filePath = path.join(pluginsDir, name)
 
         if (!fs.existsSync(filePath))
-            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -92,7 +92,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                 document: { url: filePath },
                 mimetype: 'text/javascript',
                 fileName: name,
-                caption: `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗘𝗗𝗜𝗧* 🐸
+                caption: `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗘𝗗𝗜𝗧* 🐱
 
 *━━━━━━━━━━*
 *📄 Archivo:* *${name}*
@@ -107,7 +107,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             let newCode = m.quoted.text
             fs.writeFileSync(filePath, newCode)
             await m.react('✅')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗘𝗗𝗜𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗘𝗗𝗜𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *✅ PLUGIN EDITADO*
@@ -118,7 +118,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 > _Reinicia el bot para aplicar los cambios_`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -131,7 +131,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     // ============ GET PLUGIN ============
     if (command === 'getplugin' || command === 'get') {
-        if (!text) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗚𝗘𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+        if (!text) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗚𝗘𝗧 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
@@ -145,7 +145,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let filePath = path.join(pluginsDir, name)
 
         if (!fs.existsSync(filePath))
-            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -161,7 +161,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                     document: { url: filePath },
                     mimetype: 'text/javascript',
                     fileName: name,
-                    caption: `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗖𝗢𝗗𝗜𝗚𝗢* 🐸
+                    caption: `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗖𝗢𝗗𝗜𝗚𝗢* 🐱
 
 *━━━━━━━━━━*
 *📄 Archivo:* *${name}*
@@ -169,7 +169,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 *━━━━━━━━━━*`
                 }, { quoted: m })
             } else {
-                m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - ${name}* 🐸
+                m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - ${name}* 🐱
 
 *━━━━━━━━━━*
 \`\`js
@@ -180,7 +180,7 @@ ${code}
             await m.react('✅')
         } catch (e) {
             await m.react('❌')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -193,7 +193,7 @@ ${code}
 
     // ============ DEL PLUGIN ============
     if (command === 'delplugin' || command === 'eliminar') {
-        if (!text) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗗𝗘𝗟 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+        if (!text) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗗𝗘𝗟 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO*
@@ -207,7 +207,7 @@ ${code}
         let filePath = path.join(pluginsDir, name)
 
         if (!fs.existsSync(filePath))
-            return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -219,7 +219,7 @@ ${code}
         try {
             fs.unlinkSync(filePath)
             await m.react('✅')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗗𝗘𝗟 𝗣𝗟𝗨𝗚𝗜𝗡* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗗𝗘𝗟 𝗣𝗟𝗨𝗚𝗜𝗡* 🐱
 
 *━━━━━━━━━━*
 *✅ PLUGIN ELIMINADO*
@@ -230,7 +230,7 @@ ${code}
 > _Reinicia el bot para aplicar los cambios_`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -244,14 +244,14 @@ ${code}
     // ============ LIST PLUGINS ============
     if (command === 'plugins' || command === 'plist') {
         let files = fs.readdirSync(pluginsDir).filter(file => file.endsWith('.js'))
-        if (files.length === 0) return m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧* 🐸
+        if (files.length === 0) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *📂 No hay plugins instalados*
 
 *━━━━━━━━━━*`)
         let list = files.map((v, i) => `*${i + 1}.* ${v}`).join('\n')
-        m.reply(`🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗣𝗟𝗨𝗚𝗜𝗡𝗦* 🐸
+        m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗟𝗜𝗦𝗧𝗔 𝗗𝗘 𝗣𝗟𝗨𝗚𝗜𝗡𝗦* 🐱
 
 *━━━━━━━━━━*
 ${list}
