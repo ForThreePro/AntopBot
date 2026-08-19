@@ -1,8 +1,20 @@
-const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
+const handler = async (m, { isOwner, isAdmin, isBotAdmin, conn, participants, args }) => {
   try {
     if (!(isAdmin || isOwner)) {
       global.dfail('admin', m, conn);
       return;
+    }
+
+    if (!isBotAdmin) {
+      return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+
+*━━━━━━━━━━*
+*❌ NECESITO SER ADMIN*
+
+*➤* Dame admin para poder invocar a todos
+*➤* Usa: *.autoadmin*
+
+*━━━━━━━━━━*`)
     }
 
     const customMessage = args.join(' ') || '📢 INVOCACIÓN GENERAL'
@@ -27,7 +39,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
       { prefijo: '91', bandera: '🇮🇳' }, { prefijo: '61', bandera: '🇦🇺' },
       { prefijo: '64', bandera: '🇳🇿' }, { prefijo: '1', bandera: '🇺🇸' },
       { prefijo: '7', bandera: '🇷🇺' }, { prefijo: '63', bandera: '🇵🇭' },
-      { prefijo: '95', bandera: '🇲' }
+      { prefijo: '95', bandera: '🇲🇲' }
     ]
 
     const getCountryFlag = (mem) => {
@@ -53,10 +65,10 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     // Ordenar las banderas según el orden definido
     const orderedFlags = countryFlags.map(c => c.bandera).concat(['🚩'])
 
-    // Texto con diseño SAPITO BOT PREM
-    let messageText = `🐸 𓆩 𝗜𝗡𝗩𝗢𝗖𝗔𝗖𝗜𝗢𝗡 𝗚𝗘𝗡𝗘𝗥𝗔𝗟 𓆪 🐸
+    // Texto con diseño GARFIELD BOT OFICIAL
+    let messageText = `🐱 𓆩 𝗜𝗡𝗩𝗢𝗖𝗔𝗖𝗜𝗢𝗡 𝗚𝗘𝗡𝗘𝗥𝗔𝗟 𓆪 🐱
 
-.⃟𖥔 ݁. 𖦹˙— \`\` ${groupName} \`\` —˙𖦹.🍃꒷
+.⃟𖥔 ݁. 𖦹˙— \`\` ${groupName} \`\` —˙𖦹.🍕꒷
 
 ──🍃 *𝗜𝗡𝗙𝗢* ╏ 💚
 💚 ➛ *Integrantes:* ${participants.length}
@@ -77,14 +89,18 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 
     messageText += `
 ━━━━━━━━━━━
-*Powered by*: SAPITO BOT PREM 🍃
+*Powered by*: ***Garfield Bot Oficial*** 🍕
 *Owner*: @whois.yallico`
 
-    // NUEVA IMAGEN
-    const imageUrl = 'https://files.evogb.win/FmVWNa.jpg'
+    // NUEVAS IMAGENES ROTATORIAS
+    const images = [
+      'https://files.evogb.win/QFXQtu.jpg',
+      'https://files.evogb.win/E2yVdA.jpg'
+    ]
+    const imageUrl = { url: images[Math.floor(Math.random() * images.length)] }
 
     await conn.sendMessage(m.chat, {
-      image: { url: imageUrl },
+      image: imageUrl,
       caption: messageText,
       mentions: participants.map(a => a.jid || a.id)
     }, { quoted: m })
@@ -103,5 +119,6 @@ handler.tags = ['grupos']
 handler.command = /^(todos|invocar|tagall)$/i
 handler.admin = true
 handler.group = true
+handler.botAdmin = true
 
 export default handler
