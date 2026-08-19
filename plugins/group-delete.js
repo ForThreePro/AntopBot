@@ -1,6 +1,6 @@
 let handler = async (m, { conn, usedPrefix, command }) => {
 
-if (!m.quoted) return conn.reply(m.chat, `🐸 𓆩 𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 𝗣𝗥𝗘𝗠 𓆪 🐸
+if (!m.quoted) return conn.reply(m.chat, `🐱 𓆩 ***𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𓆪 🐱
 
 *Uso:* Responde al mensaje que deseas eliminar con *${usedPrefix + command}*`, m)
 
