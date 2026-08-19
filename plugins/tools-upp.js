@@ -5,13 +5,13 @@ import { fileTypeFromBuffer } from "file-type"
 let handler = async (m, { conn }) => {
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
-  if (!mime) return conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗡𝗜𝗩𝗘𝗟 𝗗𝗜𝗢𝗦* 🐸
+  if (!mime) return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *⚠️ ERROR DE USO ⚠️*
 
 *Instrucciones:*
-*➤* Responde a una _imagen, video, audio o documento_
+*➤* Responde a una *imagen, video, audio o documento*
 *➤* Formatos: *Imagen | Video | Audio | Doc*
 
 *━━━━━━━━━━*
@@ -24,7 +24,7 @@ let handler = async (m, { conn }) => {
     let link = await myCloud(media)
     if (!link.url) throw new Error()
 
-    let txt = `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗥𝗘𝗣𝗢𝗥𝗧𝗘* 🐸
+    let txt = `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━━━━━━━━━*
 *✅ ARCHIVO SUBIDO CORRECTAMENTE*
@@ -33,20 +33,20 @@ let handler = async (m, { conn }) => {
 *➤ Enlace:* ${link.url}
 *➤ ID:* ${link.id || 'N/A'}
 *➤ Peso:* ${formatBytes(media.length)}
-*➤ Servidor:* _evogb.win_
-*➤ Bot:* *SAPITO BOT PREM*
+*➤ Servidor:* *evogb.win*
+*➤ Bot:* ***Garfield Bot Oficial***
 
 *━━━━━━━━━━━━━━━━━━*
 *Owner:* @whois.yallico 
 *WhatsApp:* +51 927 174 369
-> _"Guardado en la nube por Sapito Bot"_ ☁️⚡`
+> _"Guardado en la nube por Garfield Bot"_ ☁️⚡`
 
-    await conn.sendFile(m.chat, media, 'sapito.' + link.url.split('.').pop(), txt, m)
+    await conn.sendFile(m.chat, media, 'garfield.' + link.url.split('.').pop(), txt, m)
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
   } catch (e) {
     console.error(e)
     await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    await conn.reply(m.chat, `🐸 *𝗦𝗔𝗣𝗜𝗧𝗢 𝗕𝗢𝗧 - 𝗡𝗜𝗩𝗘𝗟 𝗗𝗜𝗢𝗦* 🐸
+    await conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
 
 *━━━━━━━━━━*
 *❌ ERROR DE SUBIDA ❌*
