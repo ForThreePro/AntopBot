@@ -1,41 +1,62 @@
 let handler = async (m, { conn }) => {
     
-    if (!m.quoted) return m.reply(`❌ *Error*\nTienes que responder DIRECTO a la foto/video de "ver 1 vez"`)
+    if (!m.quoted) return m.reply(`❌ *Error*\nResponde DIRECTO a la foto/video de "ver 1 vez"`)
     
     let q = m.quoted
     
-    // Detecta viewOnce de 2 formas por si acaso
-    let isViewOnce = q.isViewOnce || q.msg?.viewOnce || q.msg?.imageMessage?.viewOnce || q.msg?.videoMessage?.viewOnce
+    // DETECCION FORZADA v2
+    let msg = q.message || q.msg
+    let type = Object.keys(msg)[0]
+    let content = msg[type]
     
+    let isViewOnce = content?.viewOnce 
+                    || q.isViewOnce 
+                    || q.mtype?.includes('viewOnce')
+                    || content?.imageMessage?.viewOnce
+                    || content?.videoMessage?.viewOnce
+
     if (!isViewOnce) 
-        return m.reply(`❌ Ese mensaje no es de "ver 1 vez"\n\nResponde a la foto con el circulito ①`)
+        return m.reply(`❌ No detecté "ver 1 vez"\n\n1. Asegúrate de responder a la foto con ①\n2. No la abras antes\n3. El bot debe estar prendido cuando llega`)
 
     let media
     try {
         media = await q.download()
     } catch (e) {
-        return m.reply(`💀 *Ya fue*\nYa abriste ese "ver 1 vez" y se borró.`)
+        return m.reply(`💀 *Ya expiró*\nYa viste ese "ver 1 vez" o se borró del servidor.`)
     }
     
-    let caption = q.text || q.caption || ''
-    let who = `@${q.sender.split('@')[0]}` // ahora sale quien envió la foto
+    if (!media) return m.reply(`❌ No se pudo descargar`)
 
-    if (q.mtype === 'imageMessage') {
+    let caption = content.caption || content.text || ''
+    let who = `@${q.sender.split('@')[0]}`
+
+    // Enviar según tipo real
+    if (type === 'imageMessage') {
         await conn.sendMessage(m.chat, { 
             image: media, 
-            caption: `📸 *Desbloqueado por ${@m.sender.split('@')[0]}*\nEnviado por: ${who}\n\n${caption}`,
+            caption: `📸 *ANTI VER 1 VEZ*\n👤 De: ${who}\n👀 Guardado por: @${m.sender.split('@')[0]}\n\n${caption}`,
             mentions: [q.sender, m.sender] 
-        }, { quoted: m })
+        })
         
-    } else if (q.mtype === 'videoMessage') {
+    } else if (type === 'videoMessage') {
         await conn.sendMessage(m.chat, { 
             video: media, 
-            caption: `🎥 *Desbloqueado por @${m.sender.split('@')[0]}*\nEnviado por: ${who}\n\n${caption}`,
+            caption: `🎥 *ANTI VER 1 VEZ*\n👤 De: ${who}\n👀 Guardado por: @${m.sender.split('@')[0]}\n\n${caption}`,
             mentions: [q.sender, m.sender] 
-        }, { quoted: m })
+        })
+        
+    } else if (type === 'audioMessage') {
+        await conn.sendMessage(m.chat, { 
+            audio: media, 
+            mimetype: 'audio/mp4', 
+            ptt: content.ptt
+        })
+    } else {
+        return m.reply(`❌ Solo fotos, videos y audios`)
     }
 
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🔓', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '✅', key: q.key } })
 }
 
 handler.help = ['ver']
