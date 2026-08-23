@@ -1,68 +1,29 @@
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+
 let handler = async (m, { conn }) => {
+if (!m.quoted) return conn.reply(m.chat, `《✧》 Responde a una imagen/video/audio ViewOnce.`, m)
     
-    if (!m.quoted) return m.reply(`❌ *Error*\nResponde DIRECTO a la foto/video de "ver 1 vez"`)
-    
-    let q = m.quoted
-    
-    // DETECCION FORZADA v2
-    let msg = q.message || q.msg
-    let type = Object.keys(msg)[0]
-    let content = msg[type]
-    
-    let isViewOnce = content?.viewOnce 
-                    || q.isViewOnce 
-                    || q.mtype?.includes('viewOnce')
-                    || content?.imageMessage?.viewOnce
-                    || content?.videoMessage?.viewOnce
+// DETECCION MEJORADA
+let q = m.quoted
+let msg = q.message || q.msg || q
+let type = Object.keys(msg)[0]
+let content = msg[type]
 
-    if (!isViewOnce) 
-        return m.reply(`❌ No detecté "ver 1 vez"\n\n1. Asegúrate de responder a la foto con ①\n2. No la abras antes\n3. El bot debe estar prendido cuando llega`)
+if (!content?.viewOnce) return conn.reply(m.chat, `《✧》 Ese mensaje no es ViewOnce.`, m)
 
-    let media
-    try {
-        media = await q.download()
-    } catch (e) {
-        return m.reply(`💀 *Ya expiró*\nYa viste ese "ver 1 vez" o se borró del servidor.`)
-    }
-    
-    if (!media) return m.reply(`❌ No se pudo descargar`)
+let buffer = await q.download()
+let caption = content.caption || ''
 
-    let caption = content.caption || content.text || ''
-    let who = `@${q.sender.split('@')[0]}`
-
-    // Enviar según tipo real
-    if (type === 'imageMessage') {
-        await conn.sendMessage(m.chat, { 
-            image: media, 
-            caption: `📸 *ANTI VER 1 VEZ*\n👤 De: ${who}\n👀 Guardado por: @${m.sender.split('@')[0]}\n\n${caption}`,
-            mentions: [q.sender, m.sender] 
-        })
-        
-    } else if (type === 'videoMessage') {
-        await conn.sendMessage(m.chat, { 
-            video: media, 
-            caption: `🎥 *ANTI VER 1 VEZ*\n👤 De: ${who}\n👀 Guardado por: @${m.sender.split('@')[0]}\n\n${caption}`,
-            mentions: [q.sender, m.sender] 
-        })
-        
-    } else if (type === 'audioMessage') {
-        await conn.sendMessage(m.chat, { 
-            audio: media, 
-            mimetype: 'audio/mp4', 
-            ptt: content.ptt
-        })
-    } else {
-        return m.reply(`❌ Solo fotos, videos y audios`)
-    }
-
-    await conn.sendMessage(m.chat, { react: { text: '🔓', key: m.key } })
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: q.key } })
+if (/videoMessage/.test(q.mtype)) {
+    return conn.sendFile(m.chat, buffer, 'media.mp4', `《✧》 *ANTI VER 1 VEZ*\n${caption}`, m)
+} else if (/imageMessage/.test(q.mtype)) {
+    return conn.sendFile(m.chat, buffer, 'media.jpg', `《✧》 *ANTI VER 1 VEZ*\n${caption}`, m)
+} else if (/audioMessage/.test(q.mtype)) {
+    return conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mp4', ptt: content.ptt }, { quoted: m })
+} else {
+    return conn.reply(m.chat, `《✧》 Solo soporta imagen, video y audio`, m)
 }
-
 handler.help = ['ver']
 handler.tags = ['tools']
-handler.command = ['ver']
-handler.group = true
-handler.private = true
-
+handler.command = ['readviewonce', 'read', 'ver'] 
 export default handler
