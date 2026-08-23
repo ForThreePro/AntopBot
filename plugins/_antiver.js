@@ -1,7 +1,7 @@
 import fs from 'fs'
 const DB_FILE = './antiver_db.json'
 
-// Cargar base de datos
+// Cargar BD
 let antiverDB = {}
 if (fs.existsSync(DB_FILE)) antiverDB = JSON.parse(fs.readFileSync(DB_FILE))
 
@@ -9,64 +9,55 @@ function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(antiverDB))
 }
 
-let handler = async (m, { conn, args, isAdmin }) => {
+let handler = async (m, { conn, args }) => {
     let chat = m.chat
 
-    if (!args[0]) return m.reply(`📌 *Uso:* \n*.antiver on* - Activar guardado automático\n*.antiver off* - Desactivar guardado automático\n\n*Estado actual:* ${antiverDB[chat]? '🟢 ACTIVO' : '🔴 DESACTIVADO'}`)
+    if (!args[0]) return conn.reply(m.chat, `《✧》 *ANTIVER*\n.on - Activar guardado automático\n.off - Desactivar guardado automático\n\nEstado: ${antiverDB[chat]? '🟢 ACTIVO' : '🔴 DESACTIVADO'}`, m)
 
     if (args[0] === 'on') {
         antiverDB[chat] = true
         saveDB()
-        m.reply(`✅ *ANTIVER ACTIVADO*\nAhora guardaré automático todas las fotos/videos/audios de "ver 1 vez" de este chat.`)
+        conn.reply(m.chat, `《✧》 *ANTIVER ACTIVADO*\nAhora guardaré automático todos los ViewOnce de este chat.`, m)
 
     } else if (args[0] === 'off') {
         antiverDB[chat] = false
         saveDB()
-        m.reply(`❌ *ANTIVER DESACTIVADO*\nYa no guardaré los "ver 1 vez" de este chat.`)
-
-    } else {
-        m.reply(`❌ Opción no válida. Usa *.antiver on* o *.antiver off*`)
+        conn.reply(m.chat, `《✧》 *ANTIVER DESACTIVADO*\nYa no guardaré los ViewOnce.`, m)
     }
 }
 
 handler.help = ['antiver on/off']
 handler.tags = ['tools']
 handler.command = ['antiver']
-handler.group = true
-handler.admin = false // pon true si solo quieres que admins lo activen
 
-export default handler
-
-// ESTO ES LO QUE GUARDA AUTOMÁTICO
+// ESTA ES LA PARTE QUE GUARDA SOLO
 export async function before(m, { conn }) {
     if (!m.message) return
     let chat = m.chat
-
-    // Si no está activado en este chat, salir
-    if (!antiverDB[chat]) return
+    if (!antiverDB[chat]) return // si no está activo, salir
 
     let msg = m.message
     let type = Object.keys(msg)[0]
     let content = msg[type]
 
-    // Solo si es viewOnce
-    if (!content?.viewOnce) return
+    if (!content?.viewOnce) return // solo viewonce
 
     try {
-        let media = await this.downloadM(content)
-        let caption = content.caption || content.text || ''
+        let q = { message: msg, mtype: type, key: m.key }
+        let buffer = await conn.downloadM(content)
+        let caption = content.caption || ''
         let who = `@${m.sender.split('@')[0]}`
 
-        let txt = `🔓 *ANTI VER 1 VEZ - GUARDADO*\n👤 Enviado por: ${who}\n\n${caption}`
+        let txt = `《✧》 *ANTI VER 1 VEZ - AUTO*\n👤 De: ${who}\n\n${caption}`
 
         if (type === 'imageMessage') {
-            await conn.sendMessage(m.chat, { image: media, caption: txt, mentions: [m.sender] }, { quoted: m })
+            await conn.sendFile(m.chat, buffer, 'media.jpg', txt, m, false, { mentions: [m.sender] })
         }
-        if (type === 'videoMessage') {
-            await conn.sendMessage(m.chat, { video: media, caption: txt, mentions: [m.sender] }, { quoted: m })
+        else if (type === 'videoMessage') {
+            await conn.sendFile(m.chat, buffer, 'media.mp4', txt, m, false, { mentions: [m.sender] })
         }
-        if (type === 'audioMessage' || type === 'pttMessage') {
-            await conn.sendMessage(m.chat, { audio: media, mimetype: 'audio/mp4', ptt: true }, { quoted: m })
+        else if (type === 'audioMessage') {
+            await conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mp4', ptt: content.ptt }, { quoted: m })
         }
 
         await conn.sendMessage(m.chat, { react: { text: '🔓', key: m.key } })
@@ -75,3 +66,5 @@ export async function before(m, { conn }) {
         console.log('Error AntiVer:', e)
     }
 }
+
+export default handler
