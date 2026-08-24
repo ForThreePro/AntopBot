@@ -1,64 +1,61 @@
-import axios from 'axios'
+import fetch from 'node-fetch';
 
-async function tiktokScraper(url) {
-    try {
-        const key64 = 'c2FzdWtl' 
-        const decodedKey = Buffer.from(key64, 'base64').toString('utf-8')
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+  if (!args[0]) {
+    return m.reply(`🌸 *Usá bien el comando pues cerote:* \n\n✨ *Ejemplo:* ${usedPrefix + command} https://www.tiktok.com/@usuario/video/123456789`);
+  }
 
-        const { data } = await axios.get(`https://api.evogb.org/dl/tiktok?url=${encodeURIComponent(url)}&key=${decodedKey}`)
+  try {
+    await conn.reply(m.chat, '😏 *Calmate pues mija, ya estoy jalando el audio...* 🎧', m);
 
-        if (!data.status) return { status: false }
-        return {
-            status: true,
-            title: data.data.title,
-            author: data.data.author.nickname,
-            user: data.data.author.unique_id,
-            duration: data.data.duration,
-            likes: data.data.stats.likes,
-            shares: data.data.stats.shares,
-            download: data.data.dl
-        }
-    } catch (e) {
-        return { status: false }
-    }
-}
+    const res = await tiktokdl(args[0]);
 
-var handler = async (m, { conn, text, usedPrefix, command }) => {
-    let query = text ? text.trim() : (m.quoted?.text || null)
-    if (!query) return conn.reply(m.chat, `✨ *¿Qué video deseas bajar?*\n\n> *Ejemplo:* ${usedPrefix + command} https://vt.tiktok.com/...`, m)
-
-    await m.react('⚡')
-
-    const res = await tiktokScraper(query)
-
-    if (!res.status) {
-        await m.react('❌')
-        return m.reply('⚠️ *Error al procesar el enlace.*')
+    if (!res || !res.data || !res.data.music_info || !res.data.music_info.play) {
+      return m.reply('❌ *Nel mano, no jalo ni verga ese audio.*\nVerificá que el link sea válido pues 🙄.');
     }
 
-    let ui = `┏━━━━━━━━━━━━━━━━┓\n`
-    ui += `┃  ⭐ *TIKTOK DOWNLOAD* ┃\n`
-    ui += `┗━━━━━━━━━━━━━━━━┛\n\n`
-    ui += `📝 *TÍTULO:* ${res.title.slice(0, 100)}...\n`
-    ui += `👤 *AUTOR:* ${res.author} (@${res.user})\n`
-    ui += `⏱️ *DURACIÓN:* ${res.duration}\n`
-    ui += `📊 *STATS:* ❤️ ${res.likes.toLocaleString()} | 🔄 ${res.shares.toLocaleString()}\n\n`
-    ui += `🔌 *API:* https://api.evogb.org\n`
-    ui += `⚡ *Powered by Barboza Developer*\n`
-    ui += `🌐 *Zona Developers*`
+    const audio = res.data.music_info.play;
+    const info = res.data;
 
-    await conn.sendMessage(m.chat, { 
-        video: { url: res.download }, 
-        caption: ui,
-        mimetype: 'video/mp4',
-        fileName: `tiktok_v2_barboza.mp4`
-    }, { quoted: m })
+    const texto = `
+💋 *Mirá lo que te traje pues mija, tu rolita del TikTok está lista:*  
 
-    await m.react('✅')
+📌 *Título:* ${info.title || 'Ni nombre tiene esa mierda'}
+🎤 *Sonido:* ${info.music_info?.title || 'Un chorizo ahí sin info'}
+🧑🏻‍💻 *Usuario:* @${info.author?.unique_id || 'un don nadie'}
+🫧 *Nombre:* ${info.author?.nickname || 'Desconocido'}
+📅 *Publicado:* ${info.create_time || 'Ni sabe'}
+
+🔥 *Estadísticas de esa babosada:*
+💗 Likes: ${info.digg_count}
+💬 Comentarios: ${info.comment_count}
+🔁 Compartido: ${info.share_count}
+👁️‍🗨️ Vistas: ${info.play_count}
+⬇️ Descargas: ${info.download_count}
+
+🔗 https://tiktok.com/@${info.author?.unique_id || ''}/video/${info.video_id || ''}
+`.trim();
+
+    await conn.sendFile(m.chat, audio, 'tiktok-audio.mp3', texto, m, null, {
+      mimetype: 'audio/mp4'
+    });
+
+  } catch (e) {
+    console.error(e);
+    m.reply(`🚫 *Puta, algo tronó pues:* \n\n${e.message}`);
+  }
+};
+
+handler.help = ['ttmp3', 'tiktokmp3'];
+handler.tags = ['descargas'];
+handler.command = /^ttmp3|tiktokmp3$/i;
+
+export default handler;
+
+// Función para descargar desde TikWM
+async function tiktokdl(url) {
+  const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`;
+  const res = await fetch(api);
+  const json = await res.json();
+  return json;
 }
-
-handler.help = ['tiktok']
-handler.tags = ['downloader']
-handler.command = /^(tiktok|tt)$/i
-
-export default handler
