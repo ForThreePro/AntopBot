@@ -25,7 +25,6 @@ m.reply(`⚠️ Ocurrió un error: ${e.message}`)
 handler.help = ["hd"]
 handler.tags = ["tools"]
 handler.command = ["remini", "hd", "enhance"]
-handler.register = true 
 handler.limit = 1
 export default handler
 
