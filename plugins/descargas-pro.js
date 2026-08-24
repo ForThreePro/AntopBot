@@ -1,64 +1,64 @@
-import fetch from "node-fetch"
-import yts from 'yt-search'
+import axios from 'axios'
 
-const handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `*Ingrese nombre o link*\n\n*Ejemplo:* ${usedPrefix}${command} Yan Block 444`, m)
-
-    const isVideo = command === 'play2'
-    await m.react(isVideo ? '🎥' : '🎧')
-
+async function tiktokScraper(url) {
     try {
-        let videoUrl = text
-        let duration = ''
+        const key64 = 'c2FzdWtl' 
+        const decodedKey = Buffer.from(key64, 'base64').toString('utf-8')
 
-        if (!text.match(/youtu/gi)) {
-            const search = await yts(text)
-            if (!search.all.length) {
-                await m.react('❌')
-                return m.reply('❌ Sin resultados')
-            }
-            videoUrl = search.videos[0].url
-            duration = search.videos[0].timestamp
+        const { data } = await axios.get(`https://api.evogb.org/dl/tiktok?url=${encodeURIComponent(url)}&key=${decodedKey}`)
+
+        if (!data.status) return { status: false }
+        return {
+            status: true,
+            title: data.data.title,
+            author: data.data.author.nickname,
+            user: data.data.author.unique_id,
+            duration: data.data.duration,
+            likes: data.data.stats.likes,
+            shares: data.data.stats.shares,
+            download: data.data.dl
         }
-
-        const endpoint = isVideo ? 'ytmp4' : 'ytmp3'
-        const apiUrl = `https://api.delirius.store/download/${endpoint}?url=${encodeURIComponent(videoUrl)}${isVideo ? '&format=360p' : ''}`
-
-        const res = await fetch(apiUrl)
-        const json = await res.json()
-
-        if (!json.status || !json.data) {
-            await m.react('❌')
-            return m.reply('⚠️ Error API')
-        }
-
-        const { title, author, image, download } = json.data
-
-        let info = `📌 *${title}*\n👤 *${author}*\n⏱️ *${duration}*\n📦 *${isVideo ? 'MP4' : 'MP3'}*\n\n*By: Whois Developer*`
-
-        if (isVideo) {
-            await conn.sendMessage(m.chat, { 
-                video: { url: download }, 
-                caption: info,
-                mimetype: 'video/mp4'
-            }, { quoted: m })
-        } else {
-            await conn.sendMessage(m.chat, { image: { url: image }, caption: info }, { quoted: m })
-            await conn.sendMessage(m.chat, { 
-                audio: { url: download }, 
-                mimetype: 'audio/mpeg',
-                fileName: `${title}.mp3`
-            }, { quoted: m })
-        }
-
-        await m.react('✅')
-
     } catch (e) {
-        await m.react('❌')
-        conn.reply(m.chat, '🛑 Error', m)
+        return { status: false }
     }
 }
 
-handler.command = ['play']
+var handler = async (m, { conn, text, usedPrefix, command }) => {
+    let query = text ? text.trim() : (m.quoted?.text || null)
+    if (!query) return conn.reply(m.chat, `✨ *¿Qué video deseas bajar?*\n\n> *Ejemplo:* ${usedPrefix + command} https://vt.tiktok.com/...`, m)
+
+    await m.react('⚡')
+
+    const res = await tiktokScraper(query)
+
+    if (!res.status) {
+        await m.react('❌')
+        return m.reply('⚠️ *Error al procesar el enlace.*')
+    }
+
+    let ui = `┏━━━━━━━━━━━━━━━━┓\n`
+    ui += `┃  ⭐ *TIKTOK DOWNLOAD* ┃\n`
+    ui += `┗━━━━━━━━━━━━━━━━┛\n\n`
+    ui += `📝 *TÍTULO:* ${res.title.slice(0, 100)}...\n`
+    ui += `👤 *AUTOR:* ${res.author} (@${res.user})\n`
+    ui += `⏱️ *DURACIÓN:* ${res.duration}\n`
+    ui += `📊 *STATS:* ❤️ ${res.likes.toLocaleString()} | 🔄 ${res.shares.toLocaleString()}\n\n`
+    ui += `🔌 *API:* https://api.evogb.org\n`
+    ui += `⚡ *Powered by Barboza Developer*\n`
+    ui += `🌐 *Zona Developers*`
+
+    await conn.sendMessage(m.chat, { 
+        video: { url: res.download }, 
+        caption: ui,
+        mimetype: 'video/mp4',
+        fileName: `tiktok_v2_barboza.mp4`
+    }, { quoted: m })
+
+    await m.react('✅')
+}
+
+handler.help = ['tiktok']
+handler.tags = ['downloader']
+handler.command = /^(tiktok|tt)$/i
 
 export default handler
