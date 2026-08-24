@@ -7,11 +7,11 @@ let handler = async (m, { conn, text, usedPrefix }) => {
     let user = `@${m.sender.split('@')[0]}`
     let groupName = m.isGroup ? (await conn.groupMetadata(m.chat)).subject : 'Privado'
 
-    if (!text) return m.reply(`🎵 𓆩 ***𝗗𝗘𝗘𝗭𝗘𝗥 𝗦𝗘𝗔𝗥𝗖𝗛*** 𓆪 🎵\n\n✨ *¿Qué canción deseas buscar?*\n📌 *Ejemplo:* ${usedPrefix}deezer quevedo`)
+    if (!text) return m.reply(`🎵 𓆩 ***𝗗𝗘𝗘𝗭𝗘𝗥 𝗦𝗘𝗔𝗥𝗖𝗛*** 𓆪 🎵\n\n✨ *¿Qué canción deseas buscar?*\n📌 *Ejemplo:* ${usedPrefix}deezer Bad Bunny`)
 
     await m.react('🔍')
     try {
-        let { data } = await axios.get(`${API_URL}?q=${encodeURIComponent(text)}&apikey=${API_KEY}`)
+        let { data } = await axios.get(`${API_URL}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
         
         if (!data?.result || data.result.length === 0) {
             await m.react('❌')
@@ -34,8 +34,7 @@ ${res}
 🏷 *Grupo:* ${groupName}
 
 ━━━━━━━━━━━
-*Powered by*: ***Sapito Bot*** 
-*Tip:* Responde con el número 1-5 para descargar`
+*Powered by*: ***Sapito Bot***`
 
         await conn.sendMessage(m.chat, { 
             image: { url: data.result[0].thumbnail },
