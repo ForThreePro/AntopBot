@@ -1,81 +1,77 @@
+import fetch from "node-fetch"
 import yts from 'yt-search'
-import fetch from 'node-fetch'
-import ffmpeg from 'fluent-ffmpeg'
-import fs from 'fs'
-import path from 'path'
-import { tmpdir } from 'os'
 
-let handler = async (m, { conn, command, text, usedPrefix }) => {
-  if (!text) return m.reply(`🛸 *[ NOX BOT MD ]* 🌌\n\n🚩 *Escribe el nombre de lo que deseas buscar.*\n📌 Ejemplo: *${usedPrefix + command} king nasir*`)
+const handler = async (m, { conn, text, usedPrefix, command }) => {
+    try {
+        if (!text.trim()) return conn.reply(m.chat, `✨ *¡Ups! Ingresa el nombre o link de YouTube.* \n\n> *Ejemplo:* ${usedPrefix + command} Yan Block - 444`, m)
 
-  await m.react('🔍')
+        await m.react('🔍')
 
-  let res = await yts(text)
-  let vid = res.videos[0]
-  if (!vid) {
-    await m.react('❌')
-    return m.reply(`⚠️ *No se encontraron resultados.*`)
-  }
+        // Busqueda en YouTube
+        const search = await yts(text)
+        const result = search.all[0]
+        if (!result) throw '❌ No se encontraron resultados para tu búsqueda.'
 
-  await m.react('⏳')
+        const { title, thumbnail, timestamp, views, url, author } = result
 
-  let isVideo = command === 'play2'
-  let apiUrl = isVideo 
-    ? `https://api.evogb.org/dl/ytmp4?url=${encodeURIComponent(vid.url)}&quality=720&key=sasuke` 
-    : `https://api.evogb.org/dl/ytmp3?url=${encodeURIComponent(vid.url)}&key=sasuke`
+        // --- INFO DEL VIDEO ---
+        const info = `╔══🎬 *YOUTUBE DOWNLOADER* 🎬══╗\n` +
+                     `║ \n` +
+                     `║ 📌 *Título:* ${title}\n` +
+                     `║ 👤 *Canal:* ${author.name}\n` +
+                     `║ ⏳ *Duración:* ${timestamp}\n` +
+                     `║ 👁️ *Vistas:* ${views.toLocaleString()}\n` +
+                     `║ 🔗 *Link:* ${url}\n` +
+                     `║ \n` +
+                     `╚═════════════════════╝\n\n` +
+                     `> 🚀 *Enviando archivo de Delirius API...*`
 
-  let json = await (await fetch(apiUrl)).json()
-  if (!json.status) {
-    await m.react('❌')
-    return m.reply(`❌ *Error al procesar la descarga.*`)
-  }
+        await conn.sendMessage(m.chat, { image: { url: thumbnail }, caption: info }, { quoted: m })
 
-  let cap = `🛸 *[ NOX BOT MD ]* 🌌\n\n`
-  cap += `🎶 *Título:* ${vid.title}\n`
-  cap += `⏳ *Duración:* ${vid.timestamp}\n`
-  cap += `👤 *Autor:* ${vid.author.name}\n`
-  cap += `📁 *Formato:* ${isVideo ? 'VIDEO (MP4)' : 'AUDIO (MP3)'}\n\n`
-  cap += `⚙️ *NOX Bot MD • Procesando con FFmpeg...* 🌀`
+        // Determinar si es audio o video
+        const isAudio = /^(play|yta|ytmp3|playaudio)$/i.test(command)
 
-  await conn.sendMessage(m.chat, { image: { url: vid.thumbnail }, caption: cap }, { quoted: m })
+        // Configuración de la URL de la API de Delirius
+        // ytmp3 para audio, ytmp4 para video
+        const type = isAudio ? 'ytmp3' : 'ytmp4'
+        const apiUrl = `https://api.delirius.store/download/${type}?url=${encodeURIComponent(url)}`
 
-  let ext = isVideo ? 'mp4' : 'mp3'
-  let tmpFilePath = path.join(tmpdir(), `${Date.now()}.${ext}`)
+        const res = await fetch(apiUrl)
+        const json = await res.json()
 
-  await new Promise((resolve, reject) => {
-    let process = ffmpeg(json.data.dl)
-    if (isVideo) {
-      process
-        .videoCodec('libx264')
-        .audioCodec('aac')
-        .format('mp4')
-        .outputOptions(['-movflags +faststart', '-pix_fmt yuv420p'])
-    } else {
-      process
-        .audioCodec('libmp3lame')
-        .format('mp3')
+        if (!json.status || !json.data?.download) {
+            throw '🤯 El servidor de Delirius no respondió correctamente o el link es inválido.'
+        }
+
+        const downloadUrl = json.data.download
+
+        if (isAudio) {
+            // Enviar como Audio/Mensaje de voz
+            await conn.sendMessage(m.chat, { 
+                audio: { url: downloadUrl }, 
+                fileName: `${title}.mp3`, 
+                mimetype: 'audio/mpeg' 
+            }, { quoted: m })
+        } else {
+            // Enviar como Video
+            await conn.sendMessage(m.chat, { 
+                video: { url: downloadUrl }, 
+                caption: `✅ *Aquí tienes:* ${title}`,
+                fileName: `${title}.mp4`,
+                mimetype: 'video/mp4'
+            }, { quoted: m })
+        }
+
+        await m.react('✅')
+
+    } catch (e) {
+        console.error(e)
+        await m.react('❌')
+        return conn.reply(m.chat, `⚠️ *ERROR* ⚠️\n\n> _Motivo: ${e.message || e}_`, m)
     }
-
-    process
-      .on('end', () => resolve(true))
-      .on('error', (err) => reject(err))
-      .save(tmpFilePath)
-  })
-
-  let mediaBuffer = fs.readFileSync(tmpFilePath)
-
-  await conn.sendMessage(m.chat, { 
-    [isVideo ? 'video' : 'audio']: mediaBuffer, 
-    mimetype: isVideo ? 'video/mp4' : 'audio/mpeg' 
-  }, { quoted: m })
-
-  if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath)
-
-  await m.react('✅')
 }
 
-handler.help = ['play', 'play2'].map(v => v + ' <búsqueda>')
-handler.tags = ['downloader']
-handler.command = /^(play|play2)$/i
+handler.command = /^(play|yta|ytmp3|play2|ytv|ytmp4|playaudio|mp4)$/i
+handler.group = false
 
 export default handler
