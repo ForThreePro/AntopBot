@@ -1,46 +1,72 @@
-import FormData from "form-data";
-import Jimp from "jimp";
-const handler = async (m, {conn, usedPrefix, command}) => {
- try {    
-  let q = m.quoted ? m.quoted : m;
-  let mime = (q.msg || q).mimetype || q.mediaType || "";
-  if (!mime) throw `╰⊱❗️⊱ *𝙇𝙊 𝙐𝙎𝙊́ 𝙈𝘼𝙇 | 𝙐𝙎𝙀𝘿 𝙄𝙏 𝙒𝙍𝙊𝙉𝙂* ⊱❗️⊱╮\n\n𝙀𝙉𝙑𝙄𝙀 𝙐𝙉𝘼 𝙄𝙈𝘼𝙂𝙀𝙉 𝙊 𝙍𝙀𝙎𝙋𝙊𝙉𝘿𝘼 𝘼 𝙐𝙉𝘼 𝙄𝙈𝘼𝙂𝙀𝙉 𝘾𝙊𝙉 𝙀𝙇 𝘾𝙊𝙈𝘼𝙉𝘿𝙊 ${usedPrefix + command}`;
-  if (!/image\/(jpe?g|png)/.test(mime)) throw `╰⊱⚠️⊱ *𝘼𝘿𝙑𝙀𝙍𝙏𝙀𝙉𝘾𝙄𝘼 | 𝙒𝘼𝙍𝙉𝙄𝙉𝙂* ⊱⚠️⊱╮\n\nEL FORMATO DEL ARCHIVO (${mime}) NO ES COMPATIBLE, ENVÍA O RESPONDE A UNA FOTO`;
-  m.reply("*🐈 𝙈𝙀𝙅𝙊𝙍𝘼𝙉𝘿𝙊 𝙇𝘼 𝘾𝘼𝙇𝙄𝘿𝘼𝘿...*");
-  let img = await q.download?.();
-  let pr = await remini(img, "enhance");
-  conn.sendMessage(m.chat, {image: pr}, {quoted: m});
- } catch {
-  throw "╰⊱⚠️⊱ *𝘼𝘿𝙑𝙀𝙍𝙏𝙀𝙉𝘾𝙄𝘼 | 𝙒𝘼𝙍𝙉𝙄𝙉𝙂* ⊱⚠️⊱╮\n\n𝙁𝘼𝙇𝙇𝙊, 𝙋𝙊𝙍 𝙁𝘼𝙑𝙊𝙍 𝙑𝙐𝙀𝙇𝙑𝘼 𝘼 𝙄𝙉𝙏𝙀𝙉𝙏𝘼𝙍";
- }
-};
-handler.help = ["remini", "hd", "enhance"];
-handler.tags = ["ai", "tools"];
-handler.command = ["remini", "hd", "enhance"];
-export default handler;
+import fs from "fs"
+import path from "path"
+import fetch from "node-fetch"
+import Jimp from "jimp"
+import FormData from "form-data"
+import { fileURLToPath } from "url"
 
-async function remini(imageData, operation) {
-  return new Promise(async (resolve, reject) => {
-    const availableOperations = ["enhance", "recolor", "dehaze"];
-    if (availableOperations.includes(operation)) {
-      operation = operation;
-    } else {
-      operation = availableOperations[0];
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const handler = async (m, { conn }) => {
+  try {
+    let q = m.quoted || m
+    let mime = (q.msg || q).mimetype || q.mediaType || ""
+
+    if (!mime) {
+      return m.reply(`❀ Por favor, envie una imagen o responda a la imagen utilizando el comando.`)
     }
-    const baseUrl = "https://inferenceengine.vyro.ai/" + operation + ".vyro";
-    const formData = new FormData();
-    formData.append("image", Buffer.from(imageData), {filename: "enhance_image_body.jpg", contentType: "image/jpeg"});
-    formData.append("model_version", 1, {"Content-Transfer-Encoding": "binary", contentType: "multipart/form-data; charset=utf-8"});
-    formData.submit({url: baseUrl, host: "inferenceengine.vyro.ai", path: "/" + operation, protocol: "https:", headers: {"User-Agent": "okhttp/4.9.3", Connection: "Keep-Alive", "Accept-Encoding": "gzip"}},
-      function (err, res) {
-        if (err) reject(err);
-        const chunks = [];
-        res.on("data", function (chunk) {chunks.push(chunk)});
-        res.on("end", function () {resolve(Buffer.concat(chunks))});
-        res.on("error", function (err) {
-        reject(err);
-        });
-      },
-    );
-  });
+
+    if (!/image\/(jpe?g|png)/.test(mime)) {
+      return m.reply(`✧ El formato del archivo (${mime}) no es compatible, envía o responde a una imagen.`)
+    }
+
+    conn.reply(m.chat, '✧ Mejorando la calidad de la imagen....', m)
+    let buffer = await q.download()
+    let image = await Jimp.read(buffer)
+    image.resize(800, Jimp.AUTO)
+
+    let tmp = path.join(__dirname, `tmp_${Date.now()}.jpg`)
+    await image.writeAsync(tmp)
+
+    let url = await uploadToUguu(tmp)
+    if (!url) throw new Error('Lo sentimos no se pudo procesar la imagen.')
+
+    let enhanced = await upscaleImage(url)
+    await conn.sendFile(m.chat, enhanced, "hd.jpg", "", fkontak)
+  } catch (err) {
+    conn.reply(m.chat, `⚠︎ Ocurrio un error: ${err.message}`, m)
+  }
+}
+
+handler.help = ['upscale']
+handler.tags = ['tools']
+handler.command = ['hd', 'remini', 'upscale']
+
+export default handler
+
+async function uploadToUguu(filePath) {
+  const form = new FormData()
+  form.append("files[]", fs.createReadStream(filePath))
+
+  try {
+    const res = await fetch("https://uguu.se/upload.php", {
+      method: "POST",
+      headers: form.getHeaders(),
+      body: form
+    })
+
+    const json = await res.json()
+    await fs.promises.unlink(filePath)
+    return json.files?.[0]?.url
+  } catch {
+    await fs.promises.unlink(filePath)
+    return null
+  }
+}
+
+async function upscaleImage(url) {
+  const res = await fetch(`https://api.siputzx.my.id/api/iloveimg/upscale?image=${encodeURIComponent(url)}`)
+  if (!res.ok) throw new Error("No se pudo mejorar la imagen.")
+  return await res.buffer()
 }
