@@ -1,15 +1,19 @@
 import axios from 'axios'
 
-let handler = async (m, { conn, text }) => {
+const API_URL = 'https://api.stellarwa.xyz/search/deezer'
+const API_KEY = 'api-b6GCD'
+
+let handler = async (m, { conn, text, usedPrefix }) => {
     let user = `@${m.sender.split('@')[0]}`
     let groupName = m.isGroup ? (await conn.groupMetadata(m.chat)).subject : 'Privado'
 
-    if (!text) return m.reply(`🎵 𓆩 ***𝗗𝗘𝗘𝗭𝗘𝗥 𝗦𝗘𝗔𝗥𝗖𝗛*** 𓆪 🎵\n\n✨ *¿Qué canción deseas buscar?*\n📌 *Ejemplo:* ${m.prefix}deezer the weeknd`)
+    if (!text) return m.reply(`🎵 𓆩 ***𝗗𝗘𝗘𝗭𝗘𝗥 𝗦𝗘𝗔𝗥𝗖𝗛*** 𓆪 🎵\n\n✨ *¿Qué canción deseas buscar?*\n📌 *Ejemplo:* ${usedPrefix}deezer quevedo`)
 
     await m.react('🔍')
     try {
-        let { data } = await axios.get(`https://api.stellarwa.xyz/search/deezer?q=${encodeURIComponent(text)}&apikey=api-b6GCD`)
-        if (!data.status || !data.result || data.result.length === 0) {
+        let { data } = await axios.get(`${API_URL}?q=${encodeURIComponent(text)}&apikey=${API_KEY}`)
+        
+        if (!data?.result || data.result.length === 0) {
             await m.react('❌')
             return m.reply(`🎵 *No se encontraron resultados para:* ${text}`)
         }
@@ -31,9 +35,14 @@ ${res}
 
 ━━━━━━━━━━━
 *Powered by*: ***Sapito Bot*** 
-*Tip:* Responde con el número para descargar la canción`
+*Tip:* Responde con el número 1-5 para descargar`
 
-        m.reply(caption, m.chat, { mentions: [m.sender] })
+        await conn.sendMessage(m.chat, { 
+            image: { url: data.result[0].thumbnail },
+            caption: caption,
+            mentions: [m.sender]
+        }, { quoted: m })
+        
         await m.react('✅')
     } catch (e) { 
         console.log(e)
