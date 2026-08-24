@@ -86,9 +86,9 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
     return Buffer.from(data)
 }
 
-handler.help = ['removebghd', 'hdnofondo'];
+handler.help = ['removebg', 'rbg'];
 handler.tags = ['tools', 'ai'];
-handler.command = ['removebghd', 'hdnofondo'];
+handler.command = ['removebg', 'rbg'];
 handler.limit = true;
 
 export default handler;
