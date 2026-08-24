@@ -1,130 +1,75 @@
-import fetch from "node-fetch"
-import FormData from "form-data"
-import crypto from "crypto"
+import fetch from "node-fetch";
+import crypto from "crypto";
+import { FormData, File } from "formdata-node";
+import { fileTypeFromBuffer } from "file-type";
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-    const key = Buffer.from('c2FzdWtl', 'base64').toString('utf-8')
-    let q = m.quoted? m.quoted : m
-    let mime = (q.msg || q).mimetype || ''
-    let urlTarget = text? text.trim() : ''
-    let start = Date.now()
+let handler = async (m, { conn }) => {
+  let q = m.quoted ? m.quoted : m;
+  let mime = (q.msg || q).mimetype || "";
 
-    if (!urlTarget &&!/image\/(jpe?g|png)/.test(mime)) {
-        return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
+  if (!mime) {
+    return conn.reply(m.chat, "《✧》 Por favor, responde a un archivo válido.", m);
+  }
 
-*━━━━━━━━━━*
-*⚠️ ERROR DE USO*
+  try {
+    await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key } });
 
-*Instrucciones:*
-*➤* Responde a una *imagen JPG/PNG*
-*➤* O envia un *link de imagen*
-*➤* Ejemplo: *${usedPrefix + command}*
+    const media = await q.download();
+    const link = await uploadUguu(media);
 
-*Formatos:* *JPG | PNG*
+    const upscaleUrl = `${global.api.url2}/ia/upscale?image=${encodeURIComponent(link)}`;
 
-*━━━━━━━━━━*
-*Owner:* @whois.yallico 
-*WhatsApp:* +51 927 174 369`, m)
-    }
+    const txt = `*乂 H D - U P S C A L E R 乂*\n\n`
+      + `*» Tamaño:* ${formatBytes(media.length)}`;
 
-    await m.react('⏳')
-    try {
-        let finalUrl = urlTarget
+    await conn.sendFile(m.chat, upscaleUrl, "upscaled.jpg", txt, m);
 
-        if (!finalUrl && /image\/(jpe?g|png)/.test(mime)) {
-            let imgBuffer = await q.download()
-            let ext = mime.split('/')[1] || 'jpg'
-            let filename = 'garfield-' + crypto.randomBytes(8).toString('hex') + '.' + ext
+    await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+  } catch (e) {
+    console.error(e);
+    await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
+    m.reply(`《✧》 Error al procesar el archivo.\n\n*Detalles:* ${e.message}`);
+  }
+};
 
-            let formulario = new FormData()
-            formulario.append('file', imgBuffer, { filename, contentType: mime })
+handler.help = ["hd"];
+handler.tags = ["tools"];
+handler.command = ["hd"];
 
-            let resUpload = await fetch(`https://api.evogb.org/tools/upload?key=${key}`, {
-                method: 'POST',
-                body: formulario,
-                headers: {
-                   ...formulario.getHeaders(),
-                    'User-Agent': 'Mozilla/5.0'
-                }
-            })
-            let jsonUpload = await resUpload.json()
-            if (jsonUpload.status && jsonUpload.url) {
-                finalUrl = jsonUpload.url
-            } else {
-                await m.react('❌')
-                return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
+export default handler;
 
-*━━━━━━━━━━*
-*❌ ERROR AL SUBIR*
-
-*➤* No se pudo subir la imagen
-*➤* Detalle: ${jsonUpload?.message || 'Sin respuesta'}
-
-*━━━━━━━━━━*
-*Owner:* @whois.yallico 
-*WhatsApp:* +51 927 174 369`)
-            }
-        }
-
-        let resDl = await fetch(`https://api.evogb.org/tools/upscale?method=url&url=${encodeURIComponent(finalUrl)}&key=${key}`)
-        let contentType = resDl.headers.get("content-type")
-
-        if (contentType && contentType.includes("application/json")) {
-            let jsonDl = await resDl.json()
-            await m.react('❌')
-            return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
-
-*━━━━━━━━━━*
-*❌ ERROR DE API*
-
-*➤* ${jsonDl.message || 'No se pudo mejorar la imagen'}
-
-*━━━━━━━━━━*
-*Owner:* @whois.yallico 
-*WhatsApp:* +51 927 174 369`)
-        }
-
-        let buffer = await resDl.buffer()
-        let time = ((Date.now() - start) / 1000).toFixed(2)
-
-        let info = `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
-
-*━━━━━━━━━━*
-*✅ IMAGEN MEJORADA*
-
-*📊 DATOS*
-*➤ Tiempo:* ${time} segundos
-*➤ Comando:* *${command}*
-*➤ Calidad:* *4K Ultra HD*
-*➤ Bot:* ***Garfield Bot Oficial***
-
-*━━━━━━━━━━*
-*Owner:* @whois.yallico 
-*WhatsApp:* +51 927 174 369
-> _"Mejorado con IA por Garfield Bot"_ ✨`
-
-        await conn.sendMessage(m.chat, { image: buffer, caption: info }, { quoted: m })
-        await m.react('✅')
-
-    } catch (e) {
-        console.error(e)
-        await m.react('❌')
-        m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗛𝗗* 🐱
-
-*━━━━━━━━━━*
-*❌ ERROR DE SISTEMA*
-
-*➤* Error al procesar la imagen
-*➤* Intenta de nuevo en unos segundos
-
-*━━━━━━━━━━*
-*Owner:* @whois.yallico 
-*WhatsApp:* +51 927 174 369`)
-    }
+function formatBytes(bytes) {
+  if (!bytes) return "0 B";
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 }
 
-handler.help = ['upscale', 'remini', 'hd', 'mejorar']
-handler.tags = ['tools']
-handler.command = /^(upscale|remini|hd|mejorar)$/i
+async function uploadUguu(buffer) {
+  const type = await fileTypeFromBuffer(buffer);
 
-export default handler
+  if (!type) throw new Error("No se pudo detectar el tipo de archivo.");
+
+  const form = new FormData();
+  form.set(
+    "files[]",
+    new File(
+      [buffer],
+      `${crypto.randomBytes(6).toString("hex")}.${type.ext}`,
+      { type: type.mime }
+    )
+  );
+
+  const res = await fetch("https://uguu.se/upload.php", {
+    method: "POST",
+    body: form,
+    headers: form.headers
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) throw new Error(json.message || "Error al subir el archivo.");
+  if (!json.success || !json.files?.length) throw new Error("La subida falló.");
+
+  return json.files[0].url;
+}
