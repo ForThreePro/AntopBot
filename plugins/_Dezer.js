@@ -1,89 +1,41 @@
-import fetch from "node-fetch"
-import FormData from "form-data" // <- OJO: usar esta
-import crypto from "crypto"
-
-const REMOVE_BG_KEY = '3SqybUm2S1uEb9yGzErTrdfP' // tu key de remove.bg
-const EVOG_KEY = Buffer.from('c2FzdWtl', 'base64').toString('utf-8')
+import fetch from 'node-fetch'
 
 let handler = async (m, { conn, usedPrefix, command }) => {
+  try {
     let q = m.quoted ? m.quoted : m
-    let mime = (q.msg || q).mimetype || ''
-    
-    if (!/image\/(jpe?g|png)/.test(mime)) {
-        return m.reply(`📷 𓆩 ***𝗥𝗘𝗠𝗢𝗩𝗘 𝗕𝗚 + 𝗛𝗗*** 𓆪 📷\n\n⚠️ *Responde a una imagen JPG/PNG*\n📌 *Ejemplo:* ${usedPrefix + command}`)
-    }
+    let mime = (q.msg || q).mimetype || q.mediaType || ''
+    if (!/image/.test(mime)) return conn.reply(m.chat, `🖼️ Etiqueta una imagen con el comando *${usedPrefix + command}* para eliminar su fondo.`, m)
 
-    await m.react('⏳')
-    let start = Date.now()
-    
-    try {
-        // PASO 1: Descargar
-        let imgBuffer = await q.download()
-        let ext = mime.split('/')[1] || 'jpg'
-        
-        // PASO 2: Subir a evogb
-        let filename = 'temp-' + crypto.randomBytes(8).toString('hex') + '.' + ext
-        let formulario = new FormData()
-        formulario.append('file', imgBuffer, { filename, contentType: mime })
 
-        let resUpload = await fetch(`https://api.evogb.org/tools/upload?key=${EVOG_KEY}`, {
-            method: 'POST',
-            body: formulario,
-            headers: formulario.getHeaders()
-        })
-        let jsonUpload = await resUpload.json()
-        if (!jsonUpload.status || !jsonUpload.url) throw new Error('Error al subir imagen')
+    const buffer = await q.download()
 
-        // PASO 3: Mejorar a HD
-        let resHd = await fetch(`https://api.evogb.org/tools/upscale?method=url&url=${encodeURIComponent(jsonUpload.url)}&key=${EVOG_KEY}`)
-        if(!resHd.ok) throw new Error('Error al hacer HD')
-        let bufferHd = await resHd.buffer()
 
-        // PASO 4: Quitar fondo con remove.bg - AQUI ESTABA EL ERROR
-        let formRemove = new FormData() // <- usar FormData de la libreria
-        formRemove.append('image_file', bufferHd, { filename: 'hd.png', contentType: 'image/png' })
-        formRemove.append('size', 'auto')
+    const formData = new FormData()
+    formData.append('image_file', new Blob([buffer]), 'image.png')
+    formData.append('size', 'auto') 
 
-        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-            method: 'POST',
-            headers: { 
-                'X-Api-Key': REMOVE_BG_KEY,
-                ...formRemove.getHeaders() // <- importante
-            },
-            body: formRemove
-        })
+    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+      method: 'POST',
+      headers: {
+        'X-Api-Key': '3SqybUm2S1uEb9yGzErTrdfP' 
+      },
+      body: formData
+    })
 
-        if (!response.ok) {
-            let errText = await response.text()
-            throw new Error(`Error remove.bg: ${response.status} - ${errText}`)
-        }
-        
-        const resultBuffer = Buffer.from(await response.arrayBuffer())
-        let time = ((Date.now() - start) / 1000).toFixed(2)
-        
-        let caption = `📷 𓆩 𝗛𝗗 + 𝗥𝗘𝗠𝗢𝗩𝗘 𝗕𝗚 𓆪 📷
+    if (!response.ok) throw new Error(`Error eliminando fondo: ${response.statusText}`)
+    const resultBuffer = Buffer.from(await response.arrayBuffer())
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESO COMPLETADO\`\` —˙𖦹.📷꒷
 
-*✅ Estado:* Imagen mejorada a 4K + Fondo eliminado
-*⚡ Tiempo:* ${time} segundos
+    await conn.sendMessage(m.chat, { image: resultBuffer, caption: '✅ Fondo eliminado correctamente.' }, { quoted: m })
 
-━━━━━━━━━━━
-*Powered by*: ***Sapito Bot***`
-
-        await conn.sendMessage(m.chat, { image: resultBuffer, caption }, { quoted: m })
-        await m.react('✅')
-
-    } catch (e) {
-        console.error(e)
-        await m.react('❌')
-        m.reply(`❌ *Error:* ${e.message}\n\n*Nota:* Si dice "image too large" es porque el HD la hizo pesar +10MB. Prueba con una imagen más chica`)
-    }
+  } catch (err) {
+    console.error(err)
+    conn.reply(m.chat, `❌ Error: ${err.message}`, m)
+  }
 }
 
-handler.help = ['removebghd']
+handler.help = ['removebg']
 handler.tags = ['tools']
-handler.command = /^(removebghd)$/i
-handler.limit = true
+handler.command = ['removebg','nofondo']
 
 export default handler
