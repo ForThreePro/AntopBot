@@ -1,35 +1,30 @@
-import api from "#izumi/api";
+import uploadImage from '../lib/uploadImage.js'
+import { sticker } from '../lib/sticker.js'
 
-let handler = async (m, {
-    conn,
-    usedPrefix,
-    command
-}) => {
-    try {
-        const q = m.quoted ? m.quoted : m;
-        const mime = q?.msg?.mimetype || q?.mimetype || "";
+let handler = async (m, { conn, text, args }) => {
+let stiker = false
+let json
 
-        if (!/image/.test(mime)) return m.reply(`⚠️ Reply Gambar / Kirim Gambar Caption Buat ${usedPrefix + command}`);
+let q = m.quoted ? m.quoted : m
+let mime = (q.msg || q).mimetype || q.mediaType || ''
+if (/image/g.test(mime) && !/webp/g.test(mime)) {
+let buffer = await q.download()
+let media = await (uploadImage)(buffer)
+json = await (await fetch(`https://aemt.me/removebg?url=${media}`)).json()
+stiker = await sticker(false, json.url.result, global.packname, global.author)
+} else if (text) {
+json = await (await fetch(`https://aemt.me/removebg?url=${text.trim()}`)).json()
+} else return m.reply(`*Responde a una imagen o ingresa una url que sea \`(jpg, jpeg o png)\` para quitar el fondo*`)
 
-        const media = await q.download();
-        const { result: re } = await (await api.uploadEnd('/tools/removebg', { type: "image", buffer: media, mimetype: "image/jpeg" })).data;
+await mensajesEditados(conn, m)
+//await conn.sendMessage(m.chat, { text: waitttttt, edit: key })
+await conn.sendMessage(m.chat, { image: { url: json.url.result }, caption: null }, { quoted: m })
+await conn.sendFile(m.chat, stiker ? stiker : await sticker(false, json.url.result, global.packname, global.author), 'sticker.webp', '', null, true, { contextInfo: { 'forwardingScore': 200, 'isForwarded': false, externalAdReply:{ showAdAttribution: false, title: packname, body: '• STICKER •', mediaType: 2, sourceUrl: redesMenu.getRandom(), thumbnail: gataImg.getRandom()}}})
+}
+handler.command = /^(s?removebg)$/i
+export default handler
 
-        await conn.sendMessage(m.chat, {
-            image: {
-                url: re
-            },
-            caption: ` 📷 Remove Background Gambar\n\n 🔗Url: ${re || ""}`
-        }, {
-            quoted: m
-        })
-    } catch (e) {
-        m.reply("❌ Gomene Error Mungkin lu kebanyakan request");
-        console.error(e);
-    };
-};
-
-handler.help = handler.command = ["removebg", "rbg", "removebackground"];
-handler.tags = ["tools"];
-handler.limit = true;
-
-export default handler;
+const isUrl = (text) => {
+const urlRegex = /^(https?):\/\/[^\s/$.?#]+\.(jpe?g|png)$/i
+return urlRegex.test(text)
+}
