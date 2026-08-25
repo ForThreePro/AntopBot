@@ -3,15 +3,21 @@ import FormData from 'form-data';
 
 const REMOVE_BG_KEY = '3SqybUm2S1uEb9yGzErTrdfP'
 
+// FUNCION PARA REACCIONES COMPATIBLE
+const react = async (conn, m, text) => {
+  try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
+}
+
 let handler = async (m, { conn, prefix, command }) => {
   try {
-    let q = m.quoted ? m.quoted : m;
+    let q = m.quoted? m.quoted : m;
     let mime = (q.msg || q).mimetype || '';
 
     if (!mime) return m.reply(`📸 Responde a una imagen con el comando *${prefix}${command}*`);
     if (!mime.startsWith('image')) return m.reply(`⚠️ Solo se admiten imágenes.`);
 
-    await conn.sendMessage(m.chat, { react: { text: "⚡", key: m.key } });
+    await react(conn, m, "⚡");
+    await m.reply('⏳ Procesando imagen HD + Quitar fondo...')
 
     const media = await q.download();
 
@@ -21,46 +27,90 @@ let handler = async (m, { conn, prefix, command }) => {
     // PASO 2: REMOVE BG
     const formData = new FormData()
     formData.append('image_file', enhancedBuffer, { filename: 'hd.png', contentType: 'image/png' })
-    formData.append('size', 'auto') 
+    formData.append('size', 'auto')
 
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
-      headers: { 'X-Api-Key': REMOVE_BG_KEY, ...formData.getHeaders() },
+      headers: { 'X-Api-Key': REMOVE_BG_KEY,...formData.getHeaders() },
       body: formData
     })
 
     if (!response.ok) throw new Error(`Error remove.bg: ${response.statusText}`)
     const resultBuffer = Buffer.from(await response.arrayBuffer())
 
-    const caption = `╭╾━━━━╼ 〔 ⚡ 〕 ╾━━━━╼╮
-┃  ✨ *GARFIEL BOT*
-┃
-┃ ⚙️ *Proceso:* HD AI + Remove BG
-┃ 🔝 *Calidad:* High Max PNG
-┃ ✅ *Estado:* Enviado como Documento
-┃ 🔥 *By:* Whois Developers
-╰╾━━━━╼ 〔 🚀 〕 ╾━━━━╼╯`;
+    const caption = `╭─「 PROCESADO CON IA 」
+│
+│ ⚙️ PROCESO: HD + Quitar Fondo
+│ 🔝 CALIDAD: Alta
+│ 📦 FORMATO: PNG Sin Fondo
+│
+╰───────────────────────`
 
-    // ENVIAR COMO DOCUMENTO PARA 0 COMPRENSION
+    // ENVIAR IMAGEN NORMAL PRIMERO + BOTONES
     await conn.sendMessage(m.chat, {
-      document: resultBuffer,
-      mimetype: 'image/png',
-      fileName: `HD_NoBG_${Date.now()}.png`,
-      caption
+      image: resultBuffer,
+      caption: caption,
+      footer: 'Elige como quieres recibirlo',
+      buttons: [
+        {
+          buttonId: `getdoc_${Date.now()}`,
+          buttonText: { displayText: '📄 Obtener Documento' },
+          type: 1
+        },
+        {
+          buttonId: `getpng_${Date.now()}`,
+          buttonText: { displayText: '🖼️ Obtener PNG' },
+          type: 1
+        }
+      ],
+      headerType: 4
     }, { quoted: m });
 
-    await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+    // GUARDAR BUFFER EN MEMORIA PARA CUANDO PRESIONE EL BOTON
+    global.resultadosHD = global.resultadosHD || {}
+    const id = Date.now().toString()
+    global.resultadosHD[id] = resultBuffer
+
+    await react(conn, m, "✅");
 
   } catch (e) {
     console.error(e);
-    await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
-    await m.reply(`⚠️ Ocurrió un error: ${e.message}`);
+    await react(conn, m, "❌");
+    await m.reply(`❌ Ocurrió un error: ${e.message}`);
   }
 };
 
+// HANDLER PARA CUANDO PRESIONEN EL BOTON
+handler.before = async (m, { conn }) => {
+  if (!m.message?.buttonsResponseMessage) return
+  const buttonId = m.message.buttonsResponseMessage.selectedButtonId
+
+  if (buttonId?.startsWith('getdoc_') || buttonId?.startsWith('getpng_')) {
+    const id = buttonId.split('_')[1]
+    const buffer = global.resultadosHD?.[id]
+    if (!buffer) return m.reply('❌ Esta imagen ya expiró. Vuelve a procesarla.')
+
+    if (buttonId.startsWith('getdoc_')) {
+      await conn.sendMessage(m.chat, {
+        document: buffer,
+        mimetype: 'image/png',
+        fileName: `HD_NoBG_${id}.png`,
+        caption: '✅ DOCUMENTO ENVIADO SIN COMPRESIÓN'
+      }, { quoted: m })
+    } else {
+      await conn.sendMessage(m.chat, {
+        image: buffer,
+        caption: '✅ IMAGEN PNG ENVIADA'
+      }, { quoted: m })
+    }
+
+    delete global.resultadosHD[id]
+  }
+}
+
 async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
     const _size = ['low', 'medium', 'high']
-    if (!buffer || !Buffer.isBuffer(buffer)) throw new Error('Se requiere una imagen')
+    if (!buffer ||!Buffer.isBuffer(buffer)) throw new Error('Se requiere una imagen')
     if (method < 1 || method > 4) throw new Error('Métodos disponibles: 1, 2, 3, 4')
     if (!_size.includes(size)) throw new Error(`Calidades disponibles: ${_size.join(', ')}`)
 
@@ -69,11 +119,11 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
     form.append('is_pro_version', 'false')
     form.append('is_enhancing_more', 'false')
     form.append('max_image_size', size)
-    form.append('file', buffer, `didier_${Date.now()}.jpg`)
+    form.append('file', buffer, `file_${Date.now()}.jpg`)
 
     const { data } = await axios.post('https://ihancer.com/api/enhance', form, {
         headers: {
-            ...form.getHeaders(),
+           ...form.getHeaders(),
             'accept-encoding': 'gzip',
             'host': 'ihancer.com',
             'user-agent': 'Dart/3.5 (dart:io)'
