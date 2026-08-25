@@ -1,131 +1,72 @@
-import fetch from 'node-fetch'
-import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@whiskeysockets/baileys'
-
-var handler = async (m, { conn, args, usedPrefix, command }) => {
-  if (!args[0]) {
-    return m.reply(
-      `[ 🕸️ ] Has olvidado el vínculo... ¿Acaso temes revelar el portal?\n\n[ 🧠 ] Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`
-    )
-  }
-
-  if (!args[0].match(/(https?:\/\/)?(www\.)?(vm\.|vt\.)?tiktok\.com\//)) {
-    return m.reply(
-      `[ ⚠️ ] Ese enlace no pertenece al reino de TikTok. No intentes engañar a la sombra.`
-    )
-  }
-
+const handler = async (m, { args, conn, usedPrefix }) => {
   try {
-    await conn.reply(
-      m.chat,
-      '[ ⏳ ] Invocando el arte prohibido... Preparando la transferencia dimensional...',
-      m
-    )
 
-    const tiktokData = await tiktokdl(args[0])
-
-    if (!tiktokData || !tiktokData.data) {
-      return m.reply(
-        '[ 🕳️ ] La sombra no pudo extraer el contenido. El vínculo está corrompido.'
+    if (!args[0]) {
+      return conn.reply(
+        m.chat,
+        '「✦」Por favor, proporciona un enlace válido de Instagram.',
+        m
       )
     }
 
-    const videoURL = tiktokData.data.play
-    const shadowInfo = `📜 Fragmento extraído:\n> ${tiktokData.data.title || 'Sin título'}`
+    if (m.react) await m.react('🕒')
 
-    // Header tipo WhatsApp Business (miniatura + descripción debajo)
-    const businessHeader = {
-      key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false, id: 'ShadowHeader' },
-      message: {
-        locationMessage: {
-          name: '𝙩𝙞𝙠𝙩𝙤𝙠 👑',
-          jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer()),
-          vcard:
-            'BEGIN:VCARD\n' +
-            'VERSION:3.0\n' +
-            'N:;Shadow;;;\n' +
-            'FN:Shadow\n' +
-            'ORG:Eminence in Shadow\n' +
-            'TITLE:\n' +
-            'item1.TEL;waid=5804242773183:+58 0424-2773183\n' +
-            'item1.X-ABLabel:Shadow\n' +
-            'X-WA-BIZ-DESCRIPTION:Archivo invocado desde el Reino de las Sombras\n' +
-            'X-WA-BIZ-NAME:Shadow Garden\n' +
-            'END:VCARD'
-        }
-      },
-      participant: '0@s.whatsapp.net'
+    const api = `https://apiyosoyyo-ofc.onrender.com/api/instagram?url=${encodeURIComponent(args[0])}&apiKey=shadow_sk_67jp1six`
+    const res = await fetch(api)
+    const json = await res.json()
+
+    if (json?.status !== 200 || !json?.result?.data) {
+      if (m.react) await m.react('✖️')
+      return conn.reply(
+        m.chat,
+        'No se pudo obtener el contenido del enlace.',
+        m
+      )
     }
 
-    const media = await generateWAMessageContent({
-      video: { url: videoURL },
-      caption: 'TRANSMISIÓN COMPLETADA - ARCHIVO DE LAS SOMBRAS\n\n' + shadowInfo
-    }, { upload: conn.waUploadToServer, jid: m.chat })
+    const info = json.result.data
+    const mediaList = Array.isArray(info.mediaUrls) && info.mediaUrls.length
+      ? info.mediaUrls
+      : (info.downloadUrl ? [{ url: info.downloadUrl, type: 'video' }] : [])
 
-    const msg = generateWAMessageFromContent(m.chat, {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {
-            deviceListMetadata: {},
-            deviceListMetadataVersion: 2
-          },
-          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-            body: { text: 'TRANSMISIÓN COMPLETADA - ARCHIVO DE LAS SOMBRAS\n\n' + shadowInfo },
-            footer: { text: '⚔️ Shadow Garden' },
-            header: {
-              hasMediaAttachment: true,
-              videoMessage: media.videoMessage
-            },
-            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-              messageParamsJson: '',
-              buttons: [
-                {
-                  name: 'cta_copy',
-                  buttonParamsJson: JSON.stringify({
-                    display_text: 'Copiar',
-                    copy_code: '*I LOVE yosue Shadow-Bot uwu*'
-                  })
-                },
-                {
-                  name: 'cta_url',
-                  buttonParamsJson: JSON.stringify({
-                    display_text: 'Abrir TikTok',
-                    url: args[0],
-                    merchant_url: args[0]
-                  })
-                }
-              ]
-            }),
-            contextInfo: {
-              mentionedJid: [m.sender],
-              isForwarded: false
-            }
-          })
-        }
+    if (!mediaList.length) {
+      if (m.react) await m.react('✖️')
+      return conn.reply(
+        m.chat,
+        'No se pudo obtener el contenido del enlace.',
+        m
+      )
+    }
+
+    const caption = info.title ? `> ✩ ${info.title}` : '> ✩ Aqui tienes tu pedido.'
+
+    for (let media of mediaList) {
+      if (media.type === 'image') {
+        await conn.sendMessage(m.chat, {
+          image: { url: media.url },
+          caption
+        }, { quoted: m })
+      } else {
+        await conn.sendFile(
+          m.chat,
+          media.url,
+          'instagram.mp4',
+          caption,
+          m
+        )
       }
-    }, {
-      quoted: businessHeader,
-      userJid: conn.user?.jid || conn.user?.id,
-      upload: conn.waUploadToServer
-    })
+    }
 
-    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-  } catch (error1) {
-    await conn.reply(
-      m.chat,
-      `[ 🩸 ] Error detectado: ${error1}\nLas sombras no perdonan los errores...`,
-      m
-    )
+    if (m.react) await m.react('✔️')
+
+  } catch (error) {
+    if (m.react) await m.react('✖️')
+    await m.reply(`Error: ${error.message}`)
   }
 }
 
-handler.help = ['tiktok']
+handler.command = ['instagram', 'ig']
 handler.tags = ['descargas']
-handler.command = ['tt', 'tiktok']
+handler.help = ['instagram', 'ig']
 
 export default handler
-
-async function tiktokdl(url) {
-  const tikwm = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`
-  const response = await (await fetch(tikwm, { signal: AbortSignal.timeout(20000) })).json()
-  return response
-      }
