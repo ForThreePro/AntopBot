@@ -1,7 +1,7 @@
 import axios from 'axios';
 import FormData from 'form-data';
 
-const REMOVE_BG_KEY = '3SqybUm2S1uEb9yGzErTrdfP' // tu key de remove.bg
+const REMOVE_BG_KEY = '3SqybUm2S1uEb9yGzErTrdfP'
 
 let handler = async (m, { conn, prefix, command }) => {
   try {
@@ -11,25 +11,21 @@ let handler = async (m, { conn, prefix, command }) => {
     if (!mime) return m.reply(`📸 Responde a una imagen con el comando *${prefix}${command}*`);
     if (!mime.startsWith('image')) return m.reply(`⚠️ Solo se admiten imágenes.`);
 
-    // Reacción de procesamiento
     await conn.sendMessage(m.chat, { react: { text: "⚡", key: m.key } });
 
     const media = await q.download();
 
-    // PASO 1: MEJORAR CON IHANCER AI
+    // PASO 1: HD
     const enhancedBuffer = await ihancer(media, { method: 1, size: 'high' });
 
-    // PASO 2: QUITAR FONDO CON REMOVE.BG
+    // PASO 2: REMOVE BG
     const formData = new FormData()
     formData.append('image_file', enhancedBuffer, { filename: 'hd.png', contentType: 'image/png' })
     formData.append('size', 'auto') 
 
     const response = await fetch('https://api.remove.bg/v1.0/removebg', {
       method: 'POST',
-      headers: {
-        'X-Api-Key': REMOVE_BG_KEY,
-        ...formData.getHeaders()
-      },
+      headers: { 'X-Api-Key': REMOVE_BG_KEY, ...formData.getHeaders() },
       body: formData
     })
 
@@ -40,18 +36,19 @@ let handler = async (m, { conn, prefix, command }) => {
 ┃  ✨ *GARFIEL BOT*
 ┃
 ┃ ⚙️ *Proceso:* HD AI + Remove BG
-┃ 🔝 *Calidad:* High Max
-┃ ✅ *Estado:* Fondo eliminado
+┃ 🔝 *Calidad:* High Max PNG
+┃ ✅ *Estado:* Enviado como Documento
 ┃ 🔥 *By:* Whois Developers
-╰╾━━━━╼ 〔 🚀 〕 ╾━━━━╼╯
-*Power & Speed Style*`;
+╰╾━━━━╼ 〔 🚀 〕 ╾━━━━╼╯`;
 
+    // ENVIAR COMO DOCUMENTO PARA 0 COMPRENSION
     await conn.sendMessage(m.chat, {
-      image: resultBuffer,
+      document: resultBuffer,
+      mimetype: 'image/png',
+      fileName: `HD_NoBG_${Date.now()}.png`,
       caption
     }, { quoted: m });
 
-    // Reacción de éxito
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
   } catch (e) {
@@ -86,9 +83,9 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
     return Buffer.from(data)
 }
 
-handler.help = ['removebg', 'rbg'];
+handler.help = ['removebghd'];
 handler.tags = ['tools', 'ai'];
-handler.command = ['removebg', 'rbg'];
+handler.command = ['removebghd', 'hdnofondo'];
 handler.limit = true;
 
 export default handler;
