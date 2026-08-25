@@ -57,6 +57,6 @@ const handler = async (m, { conn }) => {
 handler.help = ['audivd']
 handler.tags = ['tools']
 handler.command = ['audivd']
-handler.register = true
+handler.register = false
 
 export default handler
