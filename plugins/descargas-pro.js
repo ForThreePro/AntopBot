@@ -1,72 +1,62 @@
-const handler = async (m, { args, conn, usedPrefix }) => {
-  try {
+import { join } from 'path'
+import { promises as fs } from 'fs'
+import { execFile } from 'child_process'
+import { promisify } from 'util'
 
-    if (!args[0]) {
-      return conn.reply(
-        m.chat,
-        '「✦」Por favor, proporciona un enlace válido de Instagram.',
-        m
-      )
-    }
+const execFileAsync = promisify(execFile)
 
-    if (m.react) await m.react('🕒')
+const handler = async (m, { conn }) => {
+    const q = m.quoted ? m.quoted : m
+    const mime = (q.msg || q).mimetype || ''
 
-    const api = `https://apiyosoyyo-ofc.onrender.com/api/instagram?url=${encodeURIComponent(args[0])}&apiKey=shadow_sk_67jp1six`
-    const res = await fetch(api)
-    const json = await res.json()
+    if (!/video/.test(mime)) return m.reply('✨ *Shadow Garden — Análisis*\n\n❌ Responde a un video para extraer su audio.')
 
-    if (json?.status !== 200 || !json?.result?.data) {
-      if (m.react) await m.react('✖️')
-      return conn.reply(
-        m.chat,
-        'No se pudo obtener el contenido del enlace.',
-        m
-      )
-    }
+    await m.react("⏳")
 
-    const info = json.result.data
-    const mediaList = Array.isArray(info.mediaUrls) && info.mediaUrls.length
-      ? info.mediaUrls
-      : (info.downloadUrl ? [{ url: info.downloadUrl, type: 'video' }] : [])
+    let tempVideo
+    let tempAudio
+    try {
+        const videoBuffer = await q.download()
+        if (!videoBuffer) throw new Error('No se pudo obtener el buffer del video.')
 
-    if (!mediaList.length) {
-      if (m.react) await m.react('✖️')
-      return conn.reply(
-        m.chat,
-        'No se pudo obtener el contenido del enlace.',
-        m
-      )
-    }
+        const tempDir = join(process.cwd(), './tmp')
+        await fs.stat(tempDir).catch(() => fs.mkdir(tempDir, { recursive: true }))
 
-    const caption = info.title ? `> ✩ ${info.title}` : '> ✩ Aqui tienes tu pedido.'
+        tempVideo = join(tempDir, `${Date.now()}.mp4`)
+        tempAudio = join(tempDir, `${Date.now()}.mp3`)
 
-    for (let media of mediaList) {
-      if (media.type === 'image') {
+        await fs.writeFile(tempVideo, videoBuffer)
+
+        await execFileAsync('ffmpeg', [
+            '-y',
+            '-i', tempVideo,
+            '-vn',
+            '-ar', '44100',
+            '-ac', '2',
+            '-b:a', '192k',
+            tempAudio
+        ], { timeout: 120000 })
+
+        const audioBuffer = await fs.readFile(tempAudio)
         await conn.sendMessage(m.chat, {
-          image: { url: media.url },
-          caption
+            audio: audioBuffer,
+            mimetype: 'audio/mpeg',
+            ptt: false
         }, { quoted: m })
-      } else {
-        await conn.sendFile(
-          m.chat,
-          media.url,
-          'instagram.mp4',
-          caption,
-          m
-        )
-      }
+        await m.react("✅")
+
+    } catch (e) {
+        console.error(e)
+        await m.reply('❌ Fallo al procesar el archivo: ' + e.message)
+    } finally {
+        await fs.unlink(tempVideo).catch(() => {})
+        await fs.unlink(tempAudio).catch(() => {})
     }
-
-    if (m.react) await m.react('✔️')
-
-  } catch (error) {
-    if (m.react) await m.react('✖️')
-    await m.reply(`Error: ${error.message}`)
-  }
 }
 
-handler.command = ['instagram', 'ig']
-handler.tags = ['descargas']
-handler.help = ['instagram', 'ig']
+handler.help = ['audivd']
+handler.tags = ['tools']
+handler.command = ['audivd']
+handler.register = true
 
 export default handler
