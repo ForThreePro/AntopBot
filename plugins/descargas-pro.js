@@ -8,35 +8,36 @@ import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@
 
 const execFileAsync = promisify(execFile)
 
+// FUNCION PARA REACCIONES COMPATIBLE
+const react = async (conn, m, text) => {
+  try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
+}
+
 // HANDLER PRINCIPAL
 const handler = async (m, { conn, args, text, usedPrefix, command }) => {
 
-  // COMANDO:.play
   if (command === 'play') {
     if (!text) return m.reply(`🕸️ *SHADOW PLAY*\n\n*Uso:* ${usedPrefix}${command} <nombre o link de YouTube>\n*Ejemplo:* ${usedPrefix}${command} Feid Luna`)
-    await conn.react(m.chat, "⏳", m.key)
+    await react(conn, m, "⏳")
     return await playCommand(conn, m, text)
   }
 
-  // COMANDO:.tiktok /.tt
   if (['tiktok', 'tt'].includes(command)) {
     if (!args[0]) return m.reply(`[ 🕸️ ] *SHADOW TIKTOK*\n\n*Uso:* ${usedPrefix + command} <link de tiktok>`)
     if (!args[0].match(/(https?:\/\/)?(www\.)?(vm\.|vt\.|www\.)?tiktok\.com\//)) return m.reply(`[ ⚠️ ] Ese enlace no pertenece al reino de TikTok.`)
-    await conn.react(m.chat, "⏳", m.key)
+    await react(conn, m, "⏳")
     return await tiktokCommand(conn, m, args[0])
   }
 
-  // COMANDO:.audivd /.audio
   if (['audivd', 'audio'].includes(command)) {
     const q = m.quoted? m.quoted : m
     const mime = (q.msg || q).mimetype || ''
     if (!/video/.test(mime)) return m.reply('✨ *Shadow Garden — Análisis*\n\n❌ Responde a un video para extraer su audio.')
-    await conn.react(m.chat, "⏳", m.key)
+    await react(conn, m, "⏳")
     return await audivdCommand(conn, m, q)
   }
 }
 
-// FUNCION.PLAY
 async function playCommand(conn, m, text) {
   try {
     let url = text.trim()
@@ -71,15 +72,14 @@ async function playCommand(conn, m, text) {
 
     await conn.sendMessage(m.chat, { image: thumbBuffer, caption }, { quoted: m })
     await downloadYouTubeAudio(conn, m, videoUrl)
-    await conn.react(m.chat, "✅", m.key)
+    await react(conn, m, "✅")
 
   } catch (e) {
-    await conn.react(m.chat, "❌", m.key)
+    await react(conn, m, "❌")
     m.reply(`[ 🩸 ] Error: ${e.message}`)
   }
 }
 
-// FUNCION.TIKTOK
 async function tiktokCommand(conn, m, url) {
   try {
     await m.reply('[ ⏳ ] Invocando el arte prohibido...')
@@ -122,15 +122,14 @@ async function tiktokCommand(conn, m, url) {
     }, { quoted: businessHeader })
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-    await conn.react(m.chat, "✅", m.key)
+    await react(conn, m, "✅")
 
   } catch (error) {
-    await conn.react(m.chat, "❌", m.key)
+    await react(conn, m, "❌")
     m.reply(`[ 🩸 ] Error: ${error.message}`)
   }
 }
 
-// FUNCION.AUDIVD
 async function audivdCommand(conn, m, q) {
   let tempVideo, tempAudio
   try {
@@ -162,10 +161,10 @@ async function audivdCommand(conn, m, q) {
       await m.reply('🔊 *No se detectó música. Enviando audio del video...*')
       await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: `audio_extraido.mp3` }, { quoted: m })
     }
-    await conn.react(m.chat, "✅", m.key)
+    await react(conn, m, "✅")
 
   } catch (e) {
-    await conn.react(m.chat, "❌", m.key)
+    await react(conn, m, "❌")
     m.reply('❌ Fallo al procesar: ' + e.message)
   } finally {
     await fs.unlink(tempVideo).catch(() => {})
@@ -173,7 +172,6 @@ async function audivdCommand(conn, m, q) {
   }
 }
 
-// FUNCION COMPARTIDA PARA DESCARGAR YT
 async function downloadYouTubeAudio(conn, m, url) {
   const apiUrl = `https://api-gohan-v1.onrender.com/download/ytaudio?url=${encodeURIComponent(url)}`
   const r = await fetch(apiUrl)
