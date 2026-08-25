@@ -125,7 +125,7 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
 
     const { data } = await axios.post('https://ihancer.com/api/enhance', form, {
         headers: {
-          ...form.getHeaders(),
+         ...form.getHeaders(),
             'accept-encoding': 'gzip',
             'host': 'ihancer.com',
             'user-agent': 'Dart/3.5 (dart:io)'
@@ -135,9 +135,9 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
     return Buffer.from(data)
 }
 
-handler.help = ['removebghd'];
-handler.tags = ['tools', 'ai'];
-handler.command = ['removebghd', 'hdnofondo'];
+handler.help = ['removebg', 'rbg'];
+handler.tags = ['tools'];
+handler.command = ['removebg', 'rbg']; // <-- AQUI ESTAN LOS 2 COMANDOS
 handler.limit = true;
 
 export default handler;
