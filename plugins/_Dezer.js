@@ -46,30 +46,34 @@ let handler = async (m, { conn, prefix, command }) => {
 │
 ╰───────────────────────`
 
-    // ENVIAR IMAGEN NORMAL PRIMERO + BOTONES
+    // 1. ENVIAR IMAGEN NORMAL PRIMERO
     await conn.sendMessage(m.chat, {
       image: resultBuffer,
-      caption: caption,
-      footer: 'Elige como quieres recibirlo',
+      caption: caption
+    }, { quoted: m });
+
+    // 2. PREGUNTAR SI QUIERE DOCUMENTO
+    await conn.sendMessage(m.chat, {
+      text: `¿Deseas recibir esta imagen como DOCUMENTO sin compresión?`,
+      footer: 'Responde: si o no',
       buttons: [
         {
-          buttonId: `getdoc_${Date.now()}`,
-          buttonText: { displayText: '📄 Obtener Documento' },
+          buttonId: `.docsi_${m.sender}`,
+          buttonText: { displayText: '✅ SI, ENVIAR DOCUMENTO' },
           type: 1
         },
         {
-          buttonId: `getpng_${Date.now()}`,
-          buttonText: { displayText: '🖼️ Obtener PNG' },
+          buttonId: `.docno_${m.sender}`,
+          buttonText: { displayText: '❌ NO' },
           type: 1
         }
       ],
-      headerType: 4
+      headerType: 1
     }, { quoted: m });
 
-    // GUARDAR BUFFER EN MEMORIA PARA CUANDO PRESIONE EL BOTON
+    // GUARDAR TEMPORAL
     global.resultadosHD = global.resultadosHD || {}
-    const id = Date.now().toString()
-    global.resultadosHD[id] = resultBuffer
+    global.resultadosHD[m.sender] = resultBuffer
 
     await react(conn, m, "✅");
 
@@ -80,31 +84,29 @@ let handler = async (m, { conn, prefix, command }) => {
   }
 };
 
-// HANDLER PARA CUANDO PRESIONEN EL BOTON
+// HANDLER PARA BOTONES
 handler.before = async (m, { conn }) => {
   if (!m.message?.buttonsResponseMessage) return
   const buttonId = m.message.buttonsResponseMessage.selectedButtonId
 
-  if (buttonId?.startsWith('getdoc_') || buttonId?.startsWith('getpng_')) {
-    const id = buttonId.split('_')[1]
-    const buffer = global.resultadosHD?.[id]
-    if (!buffer) return m.reply('❌ Esta imagen ya expiró. Vuelve a procesarla.')
+  if (buttonId?.startsWith('.docsi_')) {
+    const sender = buttonId.split('_')[1]
+    const buffer = global.resultadosHD?.[sender]
+    if (!buffer) return m.reply('❌ El proceso expiró. Vuelve a usar el comando.')
 
-    if (buttonId.startsWith('getdoc_')) {
-      await conn.sendMessage(m.chat, {
-        document: buffer,
-        mimetype: 'image/png',
-        fileName: `HD_NoBG_${id}.png`,
-        caption: '✅ DOCUMENTO ENVIADO SIN COMPRESIÓN'
-      }, { quoted: m })
-    } else {
-      await conn.sendMessage(m.chat, {
-        image: buffer,
-        caption: '✅ IMAGEN PNG ENVIADA'
-      }, { quoted: m })
-    }
+    await conn.sendMessage(m.chat, {
+      document: buffer,
+      mimetype: 'image/png',
+      fileName: `HD_NoBG_${Date.now()}.png`,
+      caption: '✅ DOCUMENTO ENVIADO SIN COMPRESIÓN'
+    }, { quoted: m })
 
-    delete global.resultadosHD[id]
+    delete global.resultadosHD[sender]
+  }
+
+  if (buttonId?.startsWith('.docno_')) {
+    delete global.resultadosHD[m.sender]
+    await m.reply('👍 Entendido.')
   }
 }
 
@@ -123,7 +125,7 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
 
     const { data } = await axios.post('https://ihancer.com/api/enhance', form, {
         headers: {
-           ...form.getHeaders(),
+          ...form.getHeaders(),
             'accept-encoding': 'gzip',
             'host': 'ihancer.com',
             'user-agent': 'Dart/3.5 (dart:io)'
