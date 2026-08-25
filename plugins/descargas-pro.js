@@ -1,201 +1,131 @@
-import yts from "yt-search"
-import fetch from "node-fetch"
+import fetch from 'node-fetch'
+import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@whiskeysockets/baileys'
 
-const handler = async (m, { conn, text }) => {
-  if (!text) return m.reply("🎶 Ingresa el nombre o enlace del video de YouTube.")
+var handler = async (m, { conn, args, usedPrefix, command }) => {
+  if (!args[0]) {
+    return m.reply(
+      `[ 🕸️ ] Has olvidado el vínculo... ¿Acaso temes revelar el portal?\n\n[ 🧠 ] Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`
+    )
+  }
 
-  await m.react("🕘")
+  if (!args[0].match(/(https?:\/\/)?(www\.)?(vm\.|vt\.)?tiktok\.com\//)) {
+    return m.reply(
+      `[ ⚠️ ] Ese enlace no pertenece al reino de TikTok. No intentes engañar a la sombra.`
+    )
+  }
 
   try {
-    let url = text.trim()
-    let title = "Desconocido"
-    let authorName = "Desconocido"
-    let durationTimestamp = "Desconocida"
-    let views = 0
-    let thumbnail = ""
+    await conn.reply(
+      m.chat,
+      '[ ⏳ ] Invocando el arte prohibido... Preparando la transferencia dimensional...',
+      m
+    )
 
-    const isUrl = /^https?:\/\/\S+/i.test(url)
+    const tiktokData = await tiktokdl(args[0])
 
-    if (isUrl) {
-      if (!isYouTubeUrl(url)) {
-        return m.reply("🚫 El enlace no es válido de YouTube.")
-      }
-
-      const videoId = extractVideoId(url)
-      if (!videoId) {
-        return m.reply("🚫 No pude extraer el ID del video.")
-      }
-
-      const res = await yts({ videoId })
-
-      if (!res) {
-        return m.reply("🚫 No pude obtener información del video.")
-      }
-
-      title = res.title || title
-      authorName = res.author?.name || authorName
-      durationTimestamp = res.timestamp || durationTimestamp
-      views = res.views || views
-      thumbnail = res.thumbnail || thumbnail
-      url = res.url || url
-    } else {
-      const res = await yts(url)
-
-      if (!res?.videos?.length) {
-        return m.reply("🚫 No encontré nada.")
-      }
-
-      const video = res.videos[0]
-      title = video.title || title
-      authorName = video.author?.name || authorName
-      durationTimestamp = video.timestamp || durationTimestamp
-      views = video.views || views
-      url = video.url || url
-      thumbnail = video.thumbnail || thumbnail
+    if (!tiktokData || !tiktokData.data) {
+      return m.reply(
+        '[ 🕳️ ] La sombra no pudo extraer el contenido. El vínculo está corrompido.'
+      )
     }
 
-    const vistas = formatViews(views)
+    const videoURL = tiktokData.data.play
+    const shadowInfo = `📜 Fragmento extraído:\n> ${tiktokData.data.title || 'Sin título'}`
 
-    const fallbackThumbRes = await fetch("https://i.ibb.co/83pbxQN/5eecaebbc7c3.jpg")
-    const fallbackThumb = Buffer.from(await fallbackThumbRes.arrayBuffer())
-
-    const fkontak = {
-      key: {
-        fromMe: false,
-        participant: "0@s.whatsapp.net",
-        remoteJid: "status@broadcast"
-      },
+    // Header tipo WhatsApp Business (miniatura + descripción debajo)
+    const businessHeader = {
+      key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false, id: 'ShadowHeader' },
       message: {
         locationMessage: {
-          name: `『 ${title} 』`,
-          jpegThumbnail: fallbackThumb
+          name: '𝙩𝙞𝙠𝙩𝙤𝙠 👑',
+          jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer()),
+          vcard:
+            'BEGIN:VCARD\n' +
+            'VERSION:3.0\n' +
+            'N:;Shadow;;;\n' +
+            'FN:Shadow\n' +
+            'ORG:Eminence in Shadow\n' +
+            'TITLE:\n' +
+            'item1.TEL;waid=5804242773183:+58 0424-2773183\n' +
+            'item1.X-ABLabel:Shadow\n' +
+            'X-WA-BIZ-DESCRIPTION:Archivo invocado desde el Reino de las Sombras\n' +
+            'X-WA-BIZ-NAME:Shadow Garden\n' +
+            'END:VCARD'
+        }
+      },
+      participant: '0@s.whatsapp.net'
+    }
+
+    const media = await generateWAMessageContent({
+      video: { url: videoURL },
+      caption: 'TRANSMISIÓN COMPLETADA - ARCHIVO DE LAS SOMBRAS\n\n' + shadowInfo
+    }, { upload: conn.waUploadToServer, jid: m.chat })
+
+    const msg = generateWAMessageFromContent(m.chat, {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2
+          },
+          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+            body: { text: 'TRANSMISIÓN COMPLETADA - ARCHIVO DE LAS SOMBRAS\n\n' + shadowInfo },
+            footer: { text: '⚔️ Shadow Garden' },
+            header: {
+              hasMediaAttachment: true,
+              videoMessage: media.videoMessage
+            },
+            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+              messageParamsJson: '',
+              buttons: [
+                {
+                  name: 'cta_copy',
+                  buttonParamsJson: JSON.stringify({
+                    display_text: 'Copiar',
+                    copy_code: '*I LOVE yosue Shadow-Bot uwu*'
+                  })
+                },
+                {
+                  name: 'cta_url',
+                  buttonParamsJson: JSON.stringify({
+                    display_text: 'Abrir TikTok',
+                    url: args[0],
+                    merchant_url: args[0]
+                  })
+                }
+              ]
+            }),
+            contextInfo: {
+              mentionedJid: [m.sender],
+              isForwarded: false
+            }
+          })
         }
       }
-    }
+    }, {
+      quoted: businessHeader,
+      userJid: conn.user?.jid || conn.user?.id,
+      upload: conn.waUploadToServer
+    })
 
-
-const caption = `
-✧━───『 𝙸𝚗𝚏𝚘 𝚍𝚎𝚕 𝚅𝚒𝚍𝚎𝚘 』───━✧
-
-🎼 𝑻𝒊́𝒕𝒖𝒍𝒐: ${title}
-📺 𝑪𝒂𝒏𝒂𝒍: ${authorName}
-👁️ 𝑽𝒊𝒔𝒕𝒂𝒔: ${vistas}
-⏳ 𝑫𝒖𝒓𝒂𝒄𝒊𝒐́𝒏: ${durationTimestamp}
-🌐 𝑬𝒏𝒍𝒂𝒄𝒆: ${url}
-🐉 _Api:_ https://api-gohan-v1.onrender.com
-
-✧━───『 𝑺𝒉𝒂𝒅𝒐𝒘 𝑩𝒐𝒕 』───━✧
-⚡ 𝑷𝒐𝒘𝒆𝒓𝒆𝒅 𝒃𝒚 𝒀𝒐𝒔𝒖𝒆 ⚡
-`
-
-    let thumb = fallbackThumb
-
-    if (thumbnail) {
-      try {
-        thumb = (await conn.getFile(thumbnail)).data
-      } catch {
-        thumb = fallbackThumb
-      }
-    }
-
-    await conn.sendMessage(
+    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+  } catch (error1) {
+    await conn.reply(
       m.chat,
-      {
-        image: thumb,
-        caption
-      },
-      { quoted: fkontak }
+      `[ 🩸 ] Error detectado: ${error1}\nLas sombras no perdonan los errores...`,
+      m
     )
-
-    await downloadMedia(conn, m, url, fkontak)
-    await m.react("✅")
-  } catch (e) {
-    console.error(e)
-    await m.reply("❌ Error: " + e.message)
-    await m.react("⚠️")
   }
 }
 
-const downloadMedia = async (conn, m, url, quotedMsg) => {
-  try {
-    const sent = await conn.sendMessage(
-      m.chat,
-      { text: "🎵 Descargando audio..." },
-      { quoted: m }
-    )
-
-    const apiUrl = `https://api-gohan-v1.onrender.com/download/ytaudio?url=${encodeURIComponent(url)}`
-    const r = await fetch(apiUrl)
-
-    if (!r.ok) {
-      return m.reply(`🚫 Error HTTP ${r.status} al obtener el audio.`)
-    }
-
-    const data = await r.json()
-    console.log("Respuesta API:", JSON.stringify(data, null, 2))
-
-    if (!data?.status || !data?.result?.download_url) {
-      return m.reply("🚫 No se pudo obtener el audio.")
-    }
-
-    const fileUrl = data.result.download_url
-    const fileTitle = cleanName(data.result.title || "audio")
-
-    await conn.sendMessage(
-      m.chat,
-      {
-        audio: { url: fileUrl },
-        mimetype: "audio/mpeg",
-        fileName: `${fileTitle}.mp3`,
-        ptt: false
-      },
-      { quoted: quotedMsg }
-    )
-
-    try {
-      await conn.sendMessage(
-        m.chat,
-        {
-          text: `✅ Descarga completada\n\n🎼 Título: ${fileTitle}`,
-          edit: sent.key
-        }
-      )
-    } catch {
-      await m.reply(`✅ Descarga completada\n\n🎼 Título: ${fileTitle}`)
-    }
-  } catch (e) {
-    console.error(e)
-    await m.reply("❌ Error: " + e.message)
-    await m.react("💀")
-  }
-}
-
-const cleanName = (name) =>
-  String(name).replace(/[^\w\s._-]/gi, "").substring(0, 50)
-
-const formatViews = (views) => {
-  const n = Number(views)
-  if (!n || Number.isNaN(n)) return "No disponible"
-  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`
-  return n.toString()
-}
-
-const isYouTubeUrl = (url) => {
-  return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url)
-}
-
-const extractVideoId = (url) => {
-  const match =
-    url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:[?&/]|\b)/) ||
-    url.match(/youtu\.be\/([0-9A-Za-z_-]{11})/)
-  return match?.[1] || null
-}
-
-handler.command = ["play"]
-handler.tags = ["descargas"]
-handler.help = ['play'];
-handler.register = false
+handler.help = ['tiktok']
+handler.tags = ['descargas']
+handler.command = ['tt', 'tiktok']
 
 export default handler
+
+async function tiktokdl(url) {
+  const tikwm = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`
+  const response = await (await fetch(tikwm, { signal: AbortSignal.timeout(20000) })).json()
+  return response
+      }
