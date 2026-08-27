@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@whiskeysockets/baileys'
 
-// FUNCION PARA REACCIONES COMPATIBLE
+// FUNCION PARA REACCIONES COMPATIBLE 🌀
 const react = async (conn, m, text) => {
   try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
 }
@@ -9,24 +9,24 @@ const react = async (conn, m, text) => {
 var handler = async (m, { conn, args, usedPrefix, command }) => {
   if (!args[0]) {
     return m.reply(
-`DESCARGADOR DE TIKTOK
+`💙 DESCARGADOR DE TIKTOK POR ANTITOP BOT
 
-Uso: ${usedPrefix + command} <link de tiktok>
-Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`
+Uso: ${usedPrefix + command} <link de tiktok> 🫧
+Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/ 🦋`
     )
   }
 
   const url = args[0]
   if (!url.match(/(https?:\/\/)?(www\.)?(vm\.|vt\.|www\.)?tiktok\.com\//)) {
-    return m.reply(`⚠️ El enlace no es válido de TikTok.`)
+    return m.reply(`⚠️ Ups~ Ese enlace no es de TikTok lindo ┆`)
   }
 
   try {
     await react(conn, m, "⏳")
-    await m.reply('⏳ Procesando video...')
+    await m.reply('⏳ Procesando tu video... ya casi 🫐')
 
     const tiktokData = await tiktokdl(url)
-    if (!tiktokData?.data) return m.reply('❌ No se pudo obtener el video.')
+    if (!tiktokData?.data) return m.reply('❌ Ay no... no pude sacar el video 🌀')
 
     const videoURL = tiktokData.data.play
     const title = tiktokData.data.title || 'Sin título'
@@ -38,8 +38,8 @@ Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`
       key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false },
       message: {
         locationMessage: {
-          name: `TikTok`,
-          jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer())
+          name: `Antitop Bot`,
+          jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer()) // ← img en url
         }
       }
     }
@@ -51,21 +51,22 @@ Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`
         message: {
           interactiveMessage: proto.Message.InteractiveMessage.fromObject({
             body: {
-              text: `╭─「 VIDEO DE TIKTOK 」
+              text: `╭─「 🪼 VIDEO DE TIKTOK 」
 │
-│ 📝 TÍTULO: ${title}
+│ 💙 TÍTULO: ${title}
 │ 👤 AUTOR: @${author}
 │ ❤️ LIKES: ${likes}
 │ 💬 COMENTARIOS: ${comments}
 │
-╰───────────────────────`
+╰─────── 𐔌 ꒱ ───────
+Descargado sin marca de agua 🫧`
             },
-            footer: { text: 'Descarga sin marca de agua' },
+            footer: { text: 'Antitop Bot • Sin watermark 💙' },
             header: { hasMediaAttachment: true, videoMessage: media.videoMessage },
             nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
               buttons: [
-                { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: 'Copiar texto', copy_code: title }) },
-                { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: 'Ver en TikTok', url: url }) }
+                { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copiar texto', copy_code: title }) },
+                { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: '✨ Ver en TikTok', url: url }) }
               ]
             })
           })
@@ -78,7 +79,7 @@ Ejemplo: ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`
 
   } catch (error) {
     await react(conn, m, "❌")
-    m.reply(`❌ Error: ${error.message}`)
+    m.reply(`🌀 Ocurrió un error: ${error.message}`)
   }
 }
 
