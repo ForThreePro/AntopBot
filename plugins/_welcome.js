@@ -1,18 +1,18 @@
 import { WAMessageStubType } from '@whiskeysockets/baileys'
 
 const handler = async (m, { conn, args, isAdmin, isOwner }) => {
-  if (!isAdmin &&!isOwner) return conn.reply(m.chat, `💙 𐔌 ꒱ ***𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𐔌 ꒱ 💙\n\n🫐 *Solo admins pueden usar este comando*`, m)
+  if (!isAdmin &&!isOwner) return conn.reply(m.chat, `💙 𐔌 ꒱ *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 𐔌 ꒱ 💙\n\n🫐 *Solo admins pueden usar este comando*`, m)
   let chat = global.db.data.chats[m.chat]
   if (!chat) global.db.data.chats[m.chat] = {}
 
   if (/on/i.test(args[0])) {
     chat.bienvenida = true
-    await conn.reply(m.chat, `🫧 𐔌 ꒱ ***𝗕𝗜𝗘𝗡𝗩𝗘𝗡𝗜𝗗𝗔*** 𐔌 ꒱ 🫧\n\n🟢 *Activada con audios* 💙`, m)
+    await conn.reply(m.chat, `🫧 𐔌 ꒱ *𝗕𝗜𝗘𝗡𝗩𝗘𝗡𝗜𝗗𝗔* 𐔌 ꒱ 🫧\n\n🟢 *Activada con audios* 💙`, m)
   } else if (/off/i.test(args[0])) {
     chat.bienvenida = false
-    await conn.reply(m.chat, `🫧 𐔌 ꒱ ***𝗕𝗜𝗘𝗡𝗩𝗘𝗡𝗜𝗗𝗔*** 𐔌 ꒱ 🫧\n\n🔴 *Desactivada* 🌀`, m)
+    await conn.reply(m.chat, `🫧 𐔌 ꒱ *𝗕𝗜𝗘𝗡𝗩𝗘𝗡𝗜𝗗𝗔* 𐔌 ꒱ 🫧\n\n🔴 *Desactivada* 🌀`, m)
   } else {
-    await conn.reply(m.chat, `💙 𐔌 ꒱ ***𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗢𝗙𝗜𝗖𝗜𝗔𝗟*** 𐔌 ꒱ 💙\n\n📌 *Uso:* ${m.prefix}bienvenida on/off 🦋`, m)
+    await conn.reply(m.chat, `💙 𐔌 ꒱ *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 𐔌 ꒱ 💙\n\n📌 *Uso:* ${m.prefix}bienvenida on/off 🦋`, m)
   }
 }
 
