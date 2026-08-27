@@ -469,12 +469,12 @@ function clockString(ms) {
   return [d, 'd ️', h, 'h ', m, 'm ', s, 's '].map((v) => v.toString().padStart(2, 0)).join('');
 }
 
-setInterval(() => {
-  if (process.send) {
-    console.log('⟳ Reinicio automático ejecutado cada 2 horas');
-    process.send('reset');
-}
-}, 1000 * 60 * 60 * 2); // 2 horas
+//setInterval(() => {
+  //if (process.send) {
+    //console.log('⟳ Reinicio automático ejecutado cada 2 horas');
+    //process.send('reset');
+//}
+//}, 1000 * 60 * 60 * 2); // 2 horas
 
 const app = express();
 app.use(cors());
