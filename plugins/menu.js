@@ -17,7 +17,7 @@ let handler = async (m, { conn, usedPrefix }) => {
   let end = performance.now()
   let ping = (end - start).toFixed(2)
 
-  let owner = global.owner?.[0]?.[0] || '51927174369'
+  let owner = global.owner?.[0]?.[0] || '+56920592945'
   let ownerTag = `@${owner}`
   let numBot = conn.user.jid.split('@')[0]
 
