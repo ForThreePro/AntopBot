@@ -6,7 +6,9 @@ let handler = async (m, { conn, command }) => {
     // 1. RESET
     if (command === 'reset') {
         await m.react('🔄')
-        await m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗥𝗘𝗦𝗘𝗧* 🐱
+        await m.reply(`🫧 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗥𝗘𝗦𝗘𝗧* 🫧
+
+.⃟𖥔 ݁. 𖦹˙— \`\`REINICIO\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *🔄 REINICIANDO SISTEMA*
@@ -22,7 +24,9 @@ let handler = async (m, { conn, command }) => {
         try {
             await m.react('👑')
             await conn.groupParticipantsUpdate(m.chat, [conn.user.jid], 'promote')
-            await m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗔𝗗𝗠𝗜𝗡* 🐱
+            await m.reply(`👑 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗔𝗗𝗠𝗜𝗡* 👑
+
+.⃟𖥔 ݁. 𖦹˙— \`\`PROMOCION\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *✅ ADMINISTRADOR ASIGNADO*
@@ -32,7 +36,9 @@ let handler = async (m, { conn, command }) => {
 *━━━━━━━━━━*`)
         } catch (e) {
             await m.react('❌')
-            m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+            m.reply(`🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *❌ ERROR*
@@ -48,7 +54,9 @@ let handler = async (m, { conn, command }) => {
     if (command === 'update' || command === 'actualizar' || command === 'fix') {
         if (m.react) await m.react('🌀')
 
-        await conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗨𝗣𝗗𝗔𝗧𝗘* 🐱
+        await conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟 - 𝗨𝗣𝗗𝗔𝗧𝗘* 🌀
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZACION\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *🌀 ACTUALIZANDO MODULOS*
@@ -60,7 +68,9 @@ let handler = async (m, { conn, command }) => {
         exec('git pull', async (err, stdout, stderr) => {
             if (err) {
                 if (m.react) await m.react('❌')
-                return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+                return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *❌ ERROR EN LA ACTUALIZACION*
@@ -74,7 +84,9 @@ let handler = async (m, { conn, command }) => {
 
             if (stdout.includes('Already up to date.')) {
                 if (m.react) await m.react('✅')
-                return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+                return conn.reply(m.chat, `✅ *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* ✅
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZADO\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *✅ SISTEMA ACTUALIZADO*
@@ -86,7 +98,9 @@ let handler = async (m, { conn, command }) => {
             }
 
             if (m.react) await m.react('✅')
-            return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+            return conn.reply(m.chat, `✅ *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* ✅
+
+.⃟𖥔 ݁. 𖦹˙— \`\`CAMBIOS APLICADOS\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
 *✅ ACTUALIZACION APLICADA*
