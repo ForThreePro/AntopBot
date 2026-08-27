@@ -1,21 +1,59 @@
+const used = new Map() // Para anti-spam
+
 let handler = async (m, { conn, text, participants }) => {
-  const mime = m.mtype
-  const type = /imageMessage|videoMessage|conversation|extendedTextMessage/.test(mime)
-  if (!m.quoted && type) {
-    if ((mime === 'imageMessage')) {
-      conn.sendMessage(m.chat, { image: await m.download?.(), mentions: participants.map(u => conn.decodeJid(u.id)), caption: text ? text : "", mentions: participants.map(u => conn.decodeJid(u.id)) }, { quoted: m });
-    } else if ((mime === 'videoMessage')) {
-      conn.sendMessage(m.chat, { video: await m.download?.(), mentions: participants.map(u => conn.decodeJid(u.id)), mimetype: 'video/mp4', caption: text ? text : "" }, { quoted: m })
-    } else if ((mime === ("conversation") || ("extendedTextMessage"))) {
-      conn.sendMessage(m.chat, { text: text ? text : "Pᴏʀɴʜᴜʙ: @whoís.yallico", mentions: participants.map(u => conn.decodeJid(u.id)) }, { quoted: m })
+  // ANTI-SPAM 3 SEGUNDOS
+  const userId = m.sender
+  const now = Date.now()
+  if (used.has(userId) && now - used.get(userId) < 3000) {
+    return m.reply('⏰ Espera 3 segundos para volver a usar el comando')
+  }
+  used.set(userId, now)
+  setTimeout(() => used.delete(userId), 3000)
+
+  const mime = (m.quoted? m.quoted.mtype : m.mtype) || ''
+  const users = [...new Set(participants.map(u => conn.decodeJid(u.id)))] // quitar duplicados
+
+  let caption = text? text : "Pᴏʀɴʜᴜʙ: @whoís.yallico"
+
+  try {
+    if (m.quoted) {
+      // SI RESPONDE A UN MENSAJE
+      await conn.forwardMessage(m.chat, m.quoted, {
+        mentions: users
+      })
+    } else if (/image/.test(mime)) {
+      // IMAGEN
+      let media = await m.download()
+      await conn.sendMessage(m.chat, {
+        image: media,
+        caption: caption,
+        mentions: users
+      }, { quoted: m })
+    } else if (/video/.test(mime)) {
+      // VIDEO
+      let media = await m.download()
+      await conn.sendMessage(m.chat, {
+        video: media,
+        mimetype: 'video/mp4',
+        caption: caption,
+        mentions: users
+      }, { quoted: m })
+    } else {
+      // TEXTO
+      await conn.sendMessage(m.chat, {
+        text: caption,
+        mentions: users
+      }, { quoted: m })
     }
-  } else if (m.quoted) {
-    await conn.sendMessage(m.chat, { forward: m.quoted.fakeObj, mentions: participants.map(u => conn.decodeJid(u.id)) }, { quoted: m })
+  } catch (e) {
+    console.log(e)
+    m.reply('❌ Error al enviar el hidetag')
   }
 }
-handler.help = ['notify', 'hidetag']
+
+handler.help = ['hidetag [texto]', 'notify [texto]']
 handler.tags = ['grupos']
-handler.command = ['hidetag', 'notify', 'n', 'noti', 'notificar', 'notif', 'aviso', 'avisar',]
+handler.command = ['hidetag', 'notify', 'n', 'noti', 'notificar', 'notif', 'aviso', 'avisar']
 handler.group = true
 handler.admin = true
 
