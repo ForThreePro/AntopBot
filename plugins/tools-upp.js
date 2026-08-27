@@ -5,10 +5,12 @@ import { fileTypeFromBuffer } from "file-type"
 let handler = async (m, { conn }) => {
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
-  if (!mime) return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+  if (!mime) return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR DE USO\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
-*⚠️ ERROR DE USO ⚠️*
+*⚠️ FALTA ARCHIVO ⚠️*
 
 *Instrucciones:*
 *➤* Responde a una *imagen, video, audio o documento*
@@ -19,45 +21,47 @@ let handler = async (m, { conn }) => {
 *WhatsApp:* +51 927 174 369`, m)
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '☁️', key: m.key } })
     let media = await q.download()
     let link = await myCloud(media)
     if (!link.url) throw new Error()
 
-    let txt = `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+    let txt = `💙 𐔌 ꒱ 𝗔𝗥𝗖𝗛𝗜𝗩𝗢 𝗦𝗨𝗕𝗜𝗗𝗢 𐔌 ꒱ 💙
 
-*━━━━━━━━━━━━━━━━━━*
-*✅ ARCHIVO SUBIDO CORRECTAMENTE*
+.⃟𖥔 ݁. 𖦹˙— \`\`ANTITOP CLOUD\`\` —˙𖦹.🫧꒷
+
+*━━━━━━━━━━*
+*✅ SUBIDA CORRECTA*
 
 *📊 DATOS DEL ARCHIVO*
 *➤ Enlace:* ${link.url}
 *➤ ID:* ${link.id || 'N/A'}
 *➤ Peso:* ${formatBytes(media.length)}
 *➤ Servidor:* *evogb.win*
-*➤ Bot:* ***Garfield Bot Oficial***
+*➤ Bot:* ***Antitop Bot Oficial*** 🪼
 
 *━━━━━━━━━━━━━━━━━━*
 *Owner:* @whois.yallico 
 *WhatsApp:* +51 927 174 369
-> _"Guardado en la nube por Garfield Bot"_ ☁️⚡`
+> _"Guardado en la nube por Antitop Bot"_ ☁️💎`
 
-    await conn.sendFile(m.chat, media, 'garfield.' + link.url.split('.').pop(), txt, m)
+    await conn.sendFile(m.chat, media, 'antitop.' + link.url.split('.').pop(), txt, m)
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
   } catch (e) {
     console.error(e)
     await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    await conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱
+    await conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR DE SUBIDA\`\` —˙𖦹.💙꒷
 
 *━━━━━━━━━━*
-*❌ ERROR DE SUBIDA ❌*
+*❌ ERROR*
 
 *Aviso:*
 *➤* No se pudo subir el archivo
 *➤* Intenta con otro archivo
 
-*━━━━━━━━━━*
-*Owner:* @whois.yallico 
-*WhatsApp:* +51 927 174 369`, m)
+*━━━━━━━━━━*`, m)
   }
 }
 
