@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 
-// FUNCION PARA REACCIONES COMPATIBLE
+// FUNCION PARA REACCIONES COMPATIBLE 🌀
 const react = async (conn, m, text) => {
   try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
 }
@@ -10,21 +10,21 @@ const handler = async (m, { args, conn }) => {
     if (!args[0]) {
       return conn.reply(
         m.chat,
-        `DESCARGADOR DE FACEBOOK
+        `💙 DESCARGADOR DE FACEBOOK POR ANTITOP BOT
 
-Uso:.facebook <link de facebook>
-Ejemplo:.facebook https://www.facebook.com/watch?v=123`,
+Uso:.facebook <link de facebook> 🫧
+Ejemplo:.facebook https://www.facebook.com/watch?v=123 🦋`,
         m
       )
     }
 
     if (!args[0].match(/facebook\.com|fb\.watch/)) {
       await react(conn, m, '❌')
-      return m.reply('⚠️ El enlace no es válido de Facebook.')
+      return m.reply('⚠️ Ups~ Ese enlace no es de Facebook lindo ┆')
     }
 
     await react(conn, m, '⏳')
-    await m.reply('⏳ Procesando video...')
+    await m.reply('⏳ Procesando tu video... ya casi 🫐')
 
     const api = `https://yosoyyo-api-ofc.onrender.com/api/facebook?url=${encodeURIComponent(args[0])}&apiKey=yosoyyo_sk_2nbk5m69`
     const res = await fetch(api)
@@ -42,7 +42,7 @@ Ejemplo:.facebook https://www.facebook.com/watch?v=123`,
       await react(conn, m, '❌')
       return conn.reply(
         m.chat,
-        '❌ No se pudo obtener el enlace de descarga del video.',
+        '❌ Ay no... no pude sacar el link de descarga del video 🌀',
         m
       )
     }
@@ -51,17 +51,18 @@ Ejemplo:.facebook https://www.facebook.com/watch?v=123`,
     const duracion = info.duration? `\n⏱️ DURACIÓN: ${info.duration}` : ''
     const autorTxt = author.username? `\n👤 AUTOR: ${author.username}` : ''
 
-    let txt = `╭─「 VIDEO DE FACEBOOK 」
+    let txt = `╭─「 💙 VIDEO DE FACEBOOK 」
 │
 │ 📝 TÍTULO: ${titulo}${duracion}${autorTxt}
+│ 🪼 DESCARGADO POR: Antitop Bot
 │
-╰───────────────────────
-Descargando...`
+╰─────── 𐔌 ꒱ ───────
+Enviando tu video... 🫧`
 
     await conn.sendFile(
       m.chat,
       videoUrl,
-      'facebook.mp4',
+      'Antitop_FB.mp4',
       txt,
       m
     )
@@ -71,7 +72,7 @@ Descargando...`
   } catch (error) {
     console.log('Facebook API Error:', error.message)
     await react(conn, m, '❌')
-    await m.reply(`❌ Error: ${error.message}`)
+    await m.reply(`🌀 Ocurrió un error: ${error.message}`)
   }
 }
 
