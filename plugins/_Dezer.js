@@ -3,7 +3,7 @@ import FormData from 'form-data';
 
 const REMOVE_BG_KEY = '3SqybUm2S1uEb9yGzErTrdfP'
 
-// FUNCION PARA REACCIONES COMPATIBLE
+// FUNCION PARA REACCIONES COMPATIBLE 🌀
 const react = async (conn, m, text) => {
   try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
 }
@@ -13,11 +13,11 @@ let handler = async (m, { conn, prefix, command }) => {
     let q = m.quoted? m.quoted : m;
     let mime = (q.msg || q).mimetype || '';
 
-    if (!mime) return m.reply(`📸 Responde a una imagen con el comando *${prefix}${command}*`);
-    if (!mime.startsWith('image')) return m.reply(`⚠️ Solo se admiten imágenes.`);
+    if (!mime) return m.reply(`🫧 Oops~ Responde a una imagen con el comando *${prefix}${command}* ┆`);
+    if (!mime.startsWith('image')) return m.reply(`⚠️ Ay no~ Solo se admiten imágenes lindas 💙`);
 
     await react(conn, m, "⚡");
-    await m.reply('⏳ Procesando imagen HD + Quitar fondo...')
+    await m.reply('⏳ Procesando tu imagen HD + Quitando fondo... un momentito 🫐')
 
     const media = await q.download();
 
@@ -38,13 +38,13 @@ let handler = async (m, { conn, prefix, command }) => {
     if (!response.ok) throw new Error(`Error remove.bg: ${response.statusText}`)
     const resultBuffer = Buffer.from(await response.arrayBuffer())
 
-    const caption = `╭─「 PROCESADO CON IA 」
+    const caption = `╭─「 💙 PROCESADO POR ANTITOP BOT 」
 │
-│ ⚙️ PROCESO: HD + Quitar Fondo
-│ 🔝 CALIDAD: Alta
-│ 📦 FORMATO: PNG Sin Fondo
+│ 🪼 PROCESO: HD + Quitar Fondo
+│ 🌀 CALIDAD: Alta como tú
+│ 🫧 FORMATO: PNG Sin Fondo
 │
-╰───────────────────────`
+╰───────── 𐔌 ꒱ ──────────`
 
     // 1. ENVIAR IMAGEN NORMAL PRIMERO
     await conn.sendMessage(m.chat, {
@@ -54,17 +54,17 @@ let handler = async (m, { conn, prefix, command }) => {
 
     // 2. PREGUNTAR SI QUIERE DOCUMENTO
     await conn.sendMessage(m.chat, {
-      text: `¿Deseas recibir esta imagen como DOCUMENTO sin compresión?`,
-      footer: 'Responde: si o no',
+      text: `💙 ¿Quieres que te la mande como DOCUMENTO sin compresión? 🦋`,
+      footer: 'Responde tocando un botoncito ┆',
       buttons: [
         {
           buttonId: `.docsi_${m.sender}`,
-          buttonText: { displayText: '✅ SI, ENVIAR DOCUMENTO' },
+          buttonText: { displayText: '✅ SIII, ENVIAR DOCUMENTO' },
           type: 1
         },
         {
           buttonId: `.docno_${m.sender}`,
-          buttonText: { displayText: '❌ NO' },
+          buttonText: { displayText: '❌ Nop, así está bien' },
           type: 1
         }
       ],
@@ -80,7 +80,7 @@ let handler = async (m, { conn, prefix, command }) => {
   } catch (e) {
     console.error(e);
     await react(conn, m, "❌");
-    await m.reply(`❌ Ocurrió un error: ${e.message}`);
+    await m.reply(`🌀 Ups... algo salió mal: ${e.message}`);
   }
 };
 
@@ -92,13 +92,13 @@ handler.before = async (m, { conn }) => {
   if (buttonId?.startsWith('.docsi_')) {
     const sender = buttonId.split('_')[1]
     const buffer = global.resultadosHD?.[sender]
-    if (!buffer) return m.reply('❌ El proceso expiró. Vuelve a usar el comando.')
+    if (!buffer) return m.reply('❌ Se me expiró el proceso... vuelve a intentarlo lindo 🫧')
 
     await conn.sendMessage(m.chat, {
       document: buffer,
       mimetype: 'image/png',
-      fileName: `HD_NoBG_${Date.now()}.png`,
-      caption: '✅ DOCUMENTO ENVIADO SIN COMPRESIÓN'
+      fileName: `Antitop_HD_NoBG_${Date.now()}.png`,
+      caption: '✅ LISTO! Te mandé tu documento sin compresión 💙'
     }, { quoted: m })
 
     delete global.resultadosHD[sender]
@@ -106,7 +106,7 @@ handler.before = async (m, { conn }) => {
 
   if (buttonId?.startsWith('.docno_')) {
     delete global.resultadosHD[m.sender]
-    await m.reply('👍 Entendido.')
+    await m.reply('👍 Entendido coqueto~ 🪼')
   }
 }
 
@@ -125,7 +125,7 @@ async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
 
     const { data } = await axios.post('https://ihancer.com/api/enhance', form, {
         headers: {
-         ...form.getHeaders(),
+        ...form.getHeaders(),
             'accept-encoding': 'gzip',
             'host': 'ihancer.com',
             'user-agent': 'Dart/3.5 (dart:io)'
