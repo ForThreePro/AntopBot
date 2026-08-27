@@ -5,18 +5,18 @@ let handler = async (m, { conn, command }) => {
 
   // TOVID
   if (['tovid', 'tovideo'].includes(command)) {
-    if (!m.quoted) return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*⚠️ ERROR*\n\n*➤* Responde a un *sticker animado*\n*➤* Ejemplo: Responde al sticker + *tovid*\n\n*━━━━━━━━━━*`, m)
+    if (!m.quoted) return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*⚠️ FALTA STICKER*\n\n*➤* Responde a un *sticker animado*\n*➤* Ejemplo: Responde al sticker + *tovid*\n\n*━━━━━━━━━━*`, m)
     let mime = m.quoted.mimetype || ''
-    if (!/webp/.test(mime)) return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*⚠️ FORMATO NO VÁLIDO*\n\n*➤* Solo acepto *stickers animados* .webp\n\n*━━━━━━━━━━*`, m)
+    if (!/webp/.test(mime)) return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO INVÁLIDO\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*⚠️ SOLO ANIMADOS*\n\n*➤* Solo acepto *stickers animados* .webp\n\n*━━━━━━━━━━*`, m)
     try {
-      await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+      await conn.sendMessage(m.chat, { react: { text: '🎬', key: m.key } })
       let media = await m.quoted.download()
       let out = await webp2mp4(media)
-      await conn.sendFile(m.chat, out, 'garfield.mp4', `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*✅ CONVERSIÓN COMPLETADA*\n\n*➤* Tu *sticker animado* ya es *video*\n*➤* Bot: ***Garfield Bot Oficial***\n\n*━━━━━━━━━━*`, m)
+      await conn.sendFile(m.chat, out, 'antitop.mp4', `💙 𐔌 ꒱ 𝗖𝗢𝗡𝗩𝗘𝗥𝗦𝗜𝗢𝗡 𝗖𝗢𝗠𝗣𝗟𝗘𝗧𝗔𝗗𝗔 𐔌 ꒱ 💙\n\n*━━━━━━━━━━*\n*✅ VIDEO LISTO*\n\n*➤* Tu *sticker animado* ya es *video*\n*➤* Bot: ***Antitop Bot Oficial*** 🪼\n\n*━━━━━━━━━━*`, m)
       await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
     } catch {
       await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-      return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*❌ ERROR*\n\n*➤* No se pudo convertir\n\n*━━━━━━━━━━*`, m)
+      return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*❌ ERROR*\n\n*➤* No se pudo convertir\n*━━━━━━━━━━*`, m)
     }
   }
 
@@ -24,16 +24,16 @@ let handler = async (m, { conn, command }) => {
   if (['tomp3', 'toaudio'].includes(command)) {
     let q = m.quoted ? m.quoted : m
     let mime = (m.quoted ? m.quoted : m.msg).mimetype || ''
-    if (!/video|audio/.test(mime)) return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*⚠️ ERROR DE USO*\n\n*➤* Responde a un *video* o *nota de voz*\n*➤* Ejemplo: Responde al video + *tomp3*\n\n*━━━━━━━━━━*`, m)
+    if (!/video|audio/.test(mime)) return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR DE USO\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*⚠️ FALTA MEDIA*\n\n*➤* Responde a un *video* o *nota de voz*\n*➤* Ejemplo: Responde al video + *tomp3*\n\n*━━━━━━━━━━*`, m)
     try {
-      await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+      await conn.sendMessage(m.chat, { react: { text: '🎵', key: m.key } })
       let media = await q.download?.()
       let audio = await toAudio(media, 'mp4')
-      await conn.sendFile(m.chat, audio.data, 'garfield.mp3', `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*✅ AUDIO EXTRAÍDO*\n\n*➤* Tu *video/audio* ya es *mp3*\n*➤* Bot: ***Garfield Bot Oficial***\n\n*━━━━━━━━━━*`, m, null, { mimetype: 'audio/mp4' })
+      await conn.sendFile(m.chat, audio.data, 'antitop.mp3', `💙 𐔌 ꒱ 𝗔𝗨𝗗𝗜𝗢 𝗘𝗫𝗧𝗥𝗔𝗜𝗗𝗢 𐔌 ꒱ 💙\n\n*━━━━━━━━━━*\n*✅ MP3 LISTO*\n\n*➤* Tu *video/audio* ya es *mp3*\n*➤* Bot: ***Antitop Bot Oficial*** 🪼\n\n*━━━━━━━━━━*`, m, null, { mimetype: 'audio/mp4' })
       await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
     } catch {
       await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-      return conn.reply(m.chat, `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*❌ ERROR*\n\n*➤* No se pudo convertir\n*━━━━━━━━━━*`, m)
+      return conn.reply(m.chat, `🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*❌ ERROR*\n\n*➤* No se pudo convertir\n*━━━━━━━━━━*`, m)
     }
   }
 
@@ -41,15 +41,15 @@ let handler = async (m, { conn, command }) => {
   if (['toimg', 'stickerimg', 'simg'].includes(command)) {
     let q = m.quoted ? m.quoted : m
     let isSticker = q.mtype === 'stickerMessage' || (q.mimetype || '').includes('webp')
-    if (!isSticker) return m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*⚠️ ERROR DE USO*\n\n*➤* Responde a un *sticker*\n*➤* Ejemplo: Responde al sticker + *toimg*\n\n*━━━━━━━━━━*`)
+    if (!isSticker) return m.reply(`🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR DE USO\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*⚠️ FALTA STICKER*\n\n*➤* Responde a un *sticker*\n*➤* Ejemplo: Responde al sticker + *toimg*\n\n*━━━━━━━━━━*`)
     try {
       await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } })
       let media = await q.download()
-      await conn.sendMessage(m.chat, { image: media, caption: `🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*✅ STICKER CONVERTIDO*\n\n*➤* Tu *sticker* ya es *imagen JPG*\n*➤* Bot: ***Garfield Bot Oficial***\n\n*━━━━━━━━━━*` }, { quoted: m })
+      await conn.sendMessage(m.chat, { image: media, caption: `💙 𐔌 ꒱ 𝗜𝗠𝗔𝗚𝗘𝗡 𝗟𝗜𝗦𝗧𝗔 𐔌 ꒱ 💙\n\n*━━━━━━━━━━*\n*✅ STICKER CONVERTIDO*\n\n*➤* Tu *sticker* ya es *imagen JPG*\n*➤* Bot: ***Antitop Bot Oficial*** 🪼\n\n*━━━━━━━━━━*` }, { quoted: m })
       await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
     } catch {
       await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-      m.reply(`🐱 *𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🐱\n\n*━━━━━━━━━━*\n*❌ ERROR*\n\n*➤* No pude convertir el *sticker*\n\n*━━━━━━━━━━*`)
+      m.reply(`🌀 *𝗔𝗡𝗧𝗜𝗧𝗢𝗣 𝗕𝗢𝗧 𝗢𝗙𝗜𝗖𝗜𝗔𝗟* 🌀\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.💙꒷\n\n*━━━━━━━━━━*\n*❌ ERROR*\n\n*➤* No pude convertir el *sticker*\n\n*━━━━━━━━━━*`)
     }
   }
 }
