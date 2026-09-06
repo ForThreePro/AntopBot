@@ -1,143 +1,88 @@
-import axios from 'axios';
-import FormData from 'form-data';
+import axios from 'axios'
+import FormData from 'form-data'
+import { downloadContentFromMessage } from "@whiskeysockets/baileys"
 
-const REMOVE_BG_KEY = '3SqybUm2S1uEb9yGzErTrdfP'
-
-// FUNCION PARA REACCIONES COMPATIBLE 🌀
-const react = async (conn, m, text) => {
-  try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
+// CONFIG API STELLAR
+const api = {
+    url: 'https://api.stellarwa.xyz',
+    key: 'proyectsV2' // Solo esta key
 }
 
-let handler = async (m, { conn, prefix, command }) => {
-  try {
-    let q = m.quoted? m.quoted : m;
-    let mime = (q.msg || q).mimetype || '';
-
-    if (!mime) return m.reply(`🫧 Oops~ Responde a una imagen con el comando *${prefix}${command}* ┆`);
-    if (!mime.startsWith('image')) return m.reply(`⚠️ Ay no~ Solo se admiten imágenes lindas 💙`);
-
-    await react(conn, m, "⚡");
-    await m.reply('⏳ Procesando tu imagen HD + Quitando fondo... un momentito 🫐')
-
-    const media = await q.download();
-
-    // PASO 1: HD
-    const enhancedBuffer = await ihancer(media, { method: 1, size: 'high' });
-
-    // PASO 2: REMOVE BG
-    const formData = new FormData()
-    formData.append('image_file', enhancedBuffer, { filename: 'hd.png', contentType: 'image/png' })
-    formData.append('size', 'auto')
-
-    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-      method: 'POST',
-      headers: { 'X-Api-Key': REMOVE_BG_KEY,...formData.getHeaders() },
-      body: formData
-    })
-
-    if (!response.ok) throw new Error(`Error remove.bg: ${response.statusText}`)
-    const resultBuffer = Buffer.from(await response.arrayBuffer())
-
-    const caption = `╭─「 💙 PROCESADO POR ANTITOP BOT 」
-│
-│ 🪼 PROCESO: HD + Quitar Fondo
-│ 🌀 CALIDAD: Alta como tú
-│ 🫧 FORMATO: PNG Sin Fondo
-│
-╰───────── 𐔌 ꒱ ──────────`
-
-    // 1. ENVIAR IMAGEN NORMAL PRIMERO
-    await conn.sendMessage(m.chat, {
-      image: resultBuffer,
-      caption: caption
-    }, { quoted: m });
-
-    // 2. PREGUNTAR SI QUIERE DOCUMENTO
-    await conn.sendMessage(m.chat, {
-      text: `💙 ¿Quieres que te la mande como DOCUMENTO sin compresión? 🦋`,
-      footer: 'Responde tocando un botoncito ┆',
-      buttons: [
-        {
-          buttonId: `.docsi_${m.sender}`,
-          buttonText: { displayText: '✅ SIII, ENVIAR DOCUMENTO' },
-          type: 1
-        },
-        {
-          buttonId: `.docno_${m.sender}`,
-          buttonText: { displayText: '❌ Nop, así está bien' },
-          type: 1
-        }
-      ],
-      headerType: 1
-    }, { quoted: m });
-
-    // GUARDAR TEMPORAL
-    global.resultadosHD = global.resultadosHD || {}
-    global.resultadosHD[m.sender] = resultBuffer
-
-    await react(conn, m, "✅");
-
-  } catch (e) {
-    console.error(e);
-    await react(conn, m, "❌");
-    await m.reply(`🌀 Ups... algo salió mal: ${e.message}`);
-  }
-};
-
-// HANDLER PARA BOTONES
-handler.before = async (m, { conn }) => {
-  if (!m.message?.buttonsResponseMessage) return
-  const buttonId = m.message.buttonsResponseMessage.selectedButtonId
-
-  if (buttonId?.startsWith('.docsi_')) {
-    const sender = buttonId.split('_')[1]
-    const buffer = global.resultadosHD?.[sender]
-    if (!buffer) return m.reply('❌ Se me expiró el proceso... vuelve a intentarlo lindo 🫧')
-
-    await conn.sendMessage(m.chat, {
-      document: buffer,
-      mimetype: 'image/png',
-      fileName: `Antitop_HD_NoBG_${Date.now()}.png`,
-      caption: '✅ LISTO! Te mandé tu documento sin compresión 💙'
-    }, { quoted: m })
-
-    delete global.resultadosHD[sender]
-  }
-
-  if (buttonId?.startsWith('.docno_')) {
-    delete global.resultadosHD[m.sender]
-    await m.reply('👍 Entendido coqueto~ 🪼')
-  }
+function generateUniqueFilename(mime) {
+  const ext = mime.split('/')[1] || 'jpg'
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let id = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  return `${id}.${ext}`
 }
 
-async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
-    const _size = ['low', 'medium', 'high']
-    if (!buffer ||!Buffer.isBuffer(buffer)) throw new Error('Se requiere una imagen')
-    if (method < 1 || method > 4) throw new Error('Métodos disponibles: 1, 2, 3, 4')
-    if (!_size.includes(size)) throw new Error(`Calidades disponibles: ${_size.join(', ')}`)
-
-    const form = new FormData()
-    form.append('method', method.toString())
-    form.append('is_pro_version', 'false')
-    form.append('is_enhancing_more', 'false')
-    form.append('max_image_size', size)
-    form.append('file', buffer, `file_${Date.now()}.jpg`)
-
-    const { data } = await axios.post('https://ihancer.com/api/enhance', form, {
-        headers: {
-        ...form.getHeaders(),
-            'accept-encoding': 'gzip',
-            'host': 'ihancer.com',
-            'user-agent': 'Dart/3.5 (dart:io)'
-        },
-        responseType: 'arraybuffer'
-    })
-    return Buffer.from(data)
+async function uploadToUguu(buffer, mime) {
+  const body = new FormData()
+  body.append('files[]', buffer, generateUniqueFilename(mime))
+  const res = await axios.post('https://uguu.se/upload.php', body, {
+    headers: body.getHeaders(),
+    timeout: 30000
+  })
+  const url = res.data?.files?.[0]?.url
+  if (!url) throw 'No se pudo subir a Uguu'
+  return url
 }
 
-handler.help = ['removebg', 'rbg'];
-handler.tags = ['tools'];
-handler.command = ['removebg', 'rbg']; // <-- AQUI ESTAN LOS 2 COMANDOS
-handler.limit = true;
+async function upscaleImage(url) {
+  const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&key=${api.key}`
+  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 60000 })
+  if (!res.data) throw 'Stellar HD no devolvió imagen'
+  return Buffer.from(res.data)
+}
 
-export default handler;
+async function removeBgFromUrl(url) {
+  const apiUrl = `${api.url}/tools/removebg?url=${encodeURIComponent(url)}&key=${api.key}`
+  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 60000 })
+  if (!res.data) throw 'Stellar RemoveBG no devolvió imagen'
+  return Buffer.from(res.data)
+}
+
+let handler = async (m, { conn, usedPrefix, command }) => {
+    const q = m.quoted || m
+    const mime = (q.msg || q).mimetype || ''
+
+    if (!mime) return m.reply(`Responde a una imagen con: ${usedPrefix + command}`)
+    if (!/image\/(jpe?g|png)/.test(mime)) {
+      return m.reply(`Solo se acepta imagen JPG/PNG`)
+    }
+
+    try {
+      await m.react('⏳')
+
+      // Proceso: Descargar > Uguu > HD > Uguu > RemoveBG
+      const buffer = await q.download()
+      const uploadedUrl = await uploadToUguu(buffer, mime)
+      const hdBuffer = await upscaleImage(uploadedUrl)
+      const hdUrl = await uploadToUguu(hdBuffer, 'image/png')
+      const finalBuffer = await removeBgFromUrl(hdUrl)
+
+      // Enviar imagen PNG sin fondo
+      await conn.sendMessage(m.chat, {
+        image: finalBuffer,
+        caption: `*Resultado:*\n- Calidad: HD 2x\n- Fondo: Eliminado\n- Key: proyects`
+      }, { quoted: m })
+
+      // Enviar también como documento
+      await conn.sendMessage(m.chat, {
+        document: finalBuffer,
+        fileName: 'nobg.png',
+        mimetype: 'image/png',
+        caption: `Documento PNG Sin Fondo`
+      }, { quoted: m })
+
+      await m.react('✅')
+
+    } catch (err) {
+      await m.react('❌')
+      await m.reply(`Error: ${err.message || err}`)
+    }
+}
+
+handler.help = ['removebg', 'rbg', 'nobg']
+handler.tags = ['tools', 'ai']
+handler.command = /^(removebg|rbg|nobg)$/i
+export default handler
