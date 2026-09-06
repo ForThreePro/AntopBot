@@ -1,83 +1,79 @@
-import axios from 'axios';
-import FormData from 'form-data';
+import axios from 'axios'
+import FormData from 'form-data'
+import { downloadContentFromMessage } from "@whiskeysockets/baileys"
 
-let handler = async (m, { conn, prefix, command }) => {
-  try {
-    let q = m.quoted ? m.quoted : m;
-    let mime = (q.msg || q).mimetype || '';
-
-    if (!mime) return m.reply(`🫧 *Responde a una imagen* con el comando *${prefix}${command}* para mejorar su calidad.`);
-    if (!mime.startsWith('image')) return m.reply(`🌀 *Solo se admiten imágenes*`);
-
-    // Reacción de procesamiento
-    await conn.sendMessage(m.chat, {
-      react: { text: "✨", key: m.key }
-    });
-
-    const media = await q.download();
-
-    // Procesamiento con IA
-    const enhancedBuffer = await ihancer(media, { method: 1, size: 'high' });
-
-    const caption = `💙 𐔌 ꒱ 𝗠𝗘𝗝𝗢𝗥𝗔𝗗𝗢 𝗖𝗢𝗡 𝗜𝗔 𐔌 ꒱ 💙
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ANTITOP HD\`\` —˙𖦹.🫧꒷
-
-🪼 *Método:* iHancer AI
-✨ *Calidad:* High Max
-💎 *By:* Antitop Developers
-
-━━━━━━━━━━━
-*Power & Brillo Style* 🪼`;
-
-    await conn.sendMessage(m.chat, {
-      image: enhancedBuffer,
-      caption
-    }, { quoted: m });
-
-    // Reacción de éxito
-    await conn.sendMessage(m.chat, {
-      react: { text: "✅", key: m.key }
-    });
-
-  } catch (e) {
-    console.error(e);
-    await conn.sendMessage(m.chat, {
-      react: { text: "❌", key: m.key }
-    });
-    await m.reply("🌀 *Ocurrió un error al procesar la imagen con la IA*");
-  }
-};
-
-async function ihancer(buffer, { method = 1, size = 'low' } = {}) {
-    const _size = ['low', 'medium', 'high']
-
-    if (!buffer || !Buffer.isBuffer(buffer)) throw new Error('Se requiere una imagen')
-    if (method < 1 || method > 4) throw new Error('Métodos disponibles: 1, 2, 3, 4')
-    if (!_size.includes(size)) throw new Error(`Calidades disponibles: ${_size.join(', ')}`)
-
-    const form = new FormData()
-    form.append('method', method.toString())
-    form.append('is_pro_version', 'false')
-    form.append('is_enhancing_more', 'false')
-    form.append('max_image_size', size)
-    form.append('file', buffer, `antitop_${Date.now()}.jpg`) // Nombre actualizado
-
-    const { data } = await axios.post('https://ihancer.com/api/enhance', form, {
-        headers: {
-            ...form.getHeaders(),
-            'accept-encoding': 'gzip',
-            'host': 'ihancer.com',
-            'user-agent': 'Dart/3.5 (dart:io)'
-        },
-        responseType: 'arraybuffer'
-    })
-
-    return Buffer.from(data)
+// CONFIG API STELLAR
+const api = {
+    url: 'https://api.stellarwa.xyz',
+    key: 'proyectsV2'
 }
 
-handler.help = ['hd'];
-handler.tags = ['ai', 'imagen'];
-handler.command = ['hd', 'upscale', 'enhance', 'remini'];
+function generateUniqueFilename(mime) {
+  const ext = mime.split('/')[1] || 'jpg'
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let id = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  return `${id}.${ext}`
+}
 
-export default handler;
+async function uploadToUguu(buffer, mime) {
+  const body = new FormData()
+  body.append('files[]', buffer, generateUniqueFilename(mime))
+  const res = await axios.post('https://uguu.se/upload.php', body, {
+    headers: body.getHeaders(),
+    timeout: 30000
+  })
+  const url = res.data?.files?.[0]?.url
+  if (!url) throw 'No se pudo subir a Uguu'
+  return url
+}
+
+async function upscaleImage(url) {
+  const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&key=${api.key}`
+  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 60000 })
+  if (!res.data) throw 'Stellar HD no devolvió imagen'
+  return Buffer.from(res.data)
+}
+
+let handler = async (m, { conn, usedPrefix, command }) => {
+    const q = m.quoted || m
+    const mime = (q.msg || q).mimetype || ''
+
+    if (!mime) return m.reply(`Responde a una imagen con: ${usedPrefix + command}`)
+    if (!/image\/(jpe?g|png)/.test(mime)) {
+      return m.reply(`Solo se acepta imagen JPG/PNG`)
+    }
+
+    try {
+      await m.react('⏳')
+
+      // Proceso: Descargar > Uguu > HD
+      const buffer = await q.download()
+      const uploadedUrl = await uploadToUguu(buffer, mime)
+      const hdBuffer = await upscaleImage(uploadedUrl)
+
+      // Enviar imagen HD
+      await conn.sendMessage(m.chat, {
+        image: hdBuffer,
+        caption: `*Resultado HD 2x*\nKey: proyects`
+      }, { quoted: m })
+
+      // Enviar también como documento
+      await conn.sendMessage(m.chat, {
+        document: hdBuffer,
+        fileName: 'hd.png',
+        mimetype: 'image/png',
+        caption: `Documento HD 2x`
+      }, { quoted: m })
+
+      await m.react('✅')
+
+    } catch (err) {
+      await m.react('❌')
+      await m.reply(`Error: ${err.message || err}`)
+    }
+}
+
+handler.help = ['hd', 'upscale', 'remini']
+handler.tags = ['tools', 'ai']
+handler.command = /^(hd|upscale|remini)$/i
+export default handler
