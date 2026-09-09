@@ -6,8 +6,8 @@ let handler = async (m, { conn, usedPrefix }) => {
 
   let taguser = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
 
-  // Imagen fija
-  let img = { url: 'https://files.evogb.win/OdOIUP.jpg' }
+  // IMAGEN GLOBAL
+  let img = { url: global.botimg }
 
   let uptime = process.uptime() * 1000
   let _uptime = clockString(uptime)
