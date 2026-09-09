@@ -31,8 +31,8 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const userJid = m.messageStubParameters?.[0] || m.participant
   if (!userJid) return!0
 
-  // IMAGEN GLOBAL - USA global.botimg
-  const DEFAULT_IMG = global.botimg
+  // IMAGEN FIJA - Solo cambié la URL
+  const DEFAULT_IMG = 'https://files.evogb.win/1FbQzR.jpg'
   let imgBuffer = null
 
   // PASO 1: Intentar obtener foto del usuario
@@ -41,7 +41,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
     let res = await fetch(userPP)
     imgBuffer = await res.buffer()
   } catch {
-    // PASO 2: Si falla, descargar la default global
+    // PASO 2: Si falla, descargar la default fija
     try {
       let res = await fetch(DEFAULT_IMG)
       imgBuffer = await res.buffer()
