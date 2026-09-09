@@ -29,7 +29,8 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 *Owner*: @51927174369
 > *"Antitop está listo para ayudarte"* 🪼`
 
-        let img = { url: 'https://files.evogb.win/OdOIUP.jpg' }
+        // IMAGEN GLOBAL
+        let img = { url: global.botimg }
 
         await m.react('✅')
         return conn.sendMessage(m.chat, {
@@ -63,7 +64,8 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 *Owner*: @51927174369
 > *"Respondo más rápido que un parpadeo"* 🪼`
 
-        let img = { url: 'https://files.evogb.win/OdOIUP.jpg' }
+        // IMAGEN GLOBAL
+        let img = { url: global.botimg }
 
         await m.react('✅')
         return conn.sendMessage(m.chat, {
@@ -236,16 +238,16 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-          .audioCodec('libopus')
-          .toFormat('opus')
-          .outputOptions([
+         .audioCodec('libopus')
+         .toFormat('opus')
+         .outputOptions([
                     '-avoid_negative_ts make_zero',
                     '-ac 1',
                     '-b:a 64k'
                 ])
-          .on('end', () => resolve(true))
-          .on('error', (err) => reject(err))
-          .save(tmpFilePath)
+         .on('end', () => resolve(true))
+         .on('error', (err) => reject(err))
+         .save(tmpFilePath)
         })
 
         let audioBuffer = fs.readFileSync(tmpFilePath)
