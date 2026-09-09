@@ -79,8 +79,8 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 ━━━━━━━━━━━
 *Powered by*: ***Antitop Bot Oficial*** 🪼`
 
-    // IMAGEN GLOBAL
-    const imageUrl = { url: global.botimg }
+    // IMAGEN FIJA
+    const imageUrl = { url: 'https://files.evogb.win/1FbQzR.jpg' }
 
     await conn.sendMessage(m.chat, {
       image: imageUrl,
