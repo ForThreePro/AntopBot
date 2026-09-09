@@ -59,8 +59,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
 
   if (fail) return
 
-  // IMAGEN ANTITOP
-  let catalogoImg = { url: 'https://files.evogb.win/OdOIUP.jpg' } // ← img en url
+  // IMAGEN GLOBAL ANTITOP
+  let catalogoImg = { url: global.botimg }
 
   let estadoTexto = isEnable? 'Activado 🫧' : 'Desactivado ✖️'
   let estadoEmoji = isEnable? '🟢' : '🔴'
