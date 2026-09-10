@@ -30,7 +30,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 > *"Antitop está listo para ayudarte"* 🪼`
 
         // IMAGEN FIJA
-        let img = { url: 'https://files.evogb.win/1FbQzR.jpg' }
+        let img = { url: 'https://files.evogb.win/9zDB47.jpg' }
 
         await m.react('✅')
         return conn.sendMessage(m.chat, {
@@ -65,7 +65,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 > *"Respondo más rápido que un parpadeo"* 🪼`
 
         // IMAGEN FIJA
-        let img = { url: 'https://files.evogb.win/1FbQzR.jpg' }
+        let img = { url: 'https://files.evogb.win/9zDB47.jpg' }
 
         await m.react('✅')
         return conn.sendMessage(m.chat, {
