@@ -1,60 +1,41 @@
-const used = new Map() // Para anti-spam
+import { generateWAMessageFromContent } from '@whiskeysockets/baileys'
+import * as fs from 'fs'
 
-let handler = async (m, { conn, text, participants }) => {
-  // ANTI-SPAM 3 SEGUNDOS
-  const userId = m.sender
-  const now = Date.now()
-  if (used.has(userId) && now - used.get(userId) < 3000) {
-    return m.reply('⏰ Espera 3 segundos para volver a usar el comando')
-  }
-  used.set(userId, now)
-  setTimeout(() => used.delete(userId), 3000)
+var handler = async (m, { conn, text, participants, isOwner, isAdmin }) => {
+if (!m.quoted && !text) return conn.reply(m.chat, `《✧》 Por favor, ingresa un texto o cita un mensaje.`, m)
+try { 
+let users = participants.map(u => conn.decodeJid(u.id))
+let q = m.quoted ? m.quoted : m || m.text || m.sender
+let c = m.quoted ? await m.getQuotedObj() : m.msg || m.text || m.sender
+let msg = conn.cMod(m.chat, generateWAMessageFromContent(m.chat, { [m.quoted ? q.mtype : 'extendedTextMessage']: m.quoted ? c.message[q.mtype] : { text: '' || c }}, { quoted: null, userJid: conn.user.id }), text || q.text, conn.user.jid, { mentions: users })
+await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+} catch {    
+let users = participants.map(u => conn.decodeJid(u.id))
+let quoted = m.quoted ? m.quoted : m
+let mime = (quoted.msg || quoted).mimetype || ''
+let isMedia = /image|video|sticker|audio/.test(mime)
+let more = String.fromCharCode(8206)
+let masss = more.repeat(850)
+let htextos = `${text ? text : ''}`
+if ((isMedia && quoted.mtype === 'imageMessage') && htextos) {
+var mediax = await quoted.download?.()
+conn.sendMessage(m.chat, { image: mediax, mentions: users, caption: htextos, mentions: users }, { quoted: null })
+} else if ((isMedia && quoted.mtype === 'videoMessage') && htextos) {
+var mediax = await quoted.download?.()
+conn.sendMessage(m.chat, { video: mediax, mentions: users, mimetype: 'video/mp4', caption: htextos }, { quoted: null })
+} else if ((isMedia && quoted.mtype === 'audioMessage') && htextos) {
+var mediax = await quoted.download?.()
+conn.sendMessage(m.chat, { audio: mediax, mentions: users, mimetype: 'audio/mp4', fileName: `Hidetag.mp3` }, { quoted: null })
+} else if ((isMedia && quoted.mtype === 'stickerMessage') && htextos) {
+var mediax = await quoted.download?.()
+conn.sendMessage(m.chat, {sticker: mediax, mentions: users}, { quoted: null })
+} else {
+await conn.reply(m.chat, htextos, null, { mentions: [users] })
+}}}
 
-  const mime = (m.quoted? m.quoted.mtype : m.mtype) || ''
-  const users = [...new Set(participants.map(u => conn.decodeJid(u.id)))] // quitar duplicados
-
-  let caption = text? text : "Pᴏʀɴʜᴜʙ: @whoís.yallico"
-
-  try {
-    if (m.quoted) {
-      // SI RESPONDE A UN MENSAJE
-      await conn.forwardMessage(m.chat, m.quoted, {
-        mentions: users
-      })
-    } else if (/image/.test(mime)) {
-      // IMAGEN
-      let media = await m.download()
-      await conn.sendMessage(m.chat, {
-        image: media,
-        caption: caption,
-        mentions: users
-      }, { quoted: m })
-    } else if (/video/.test(mime)) {
-      // VIDEO
-      let media = await m.download()
-      await conn.sendMessage(m.chat, {
-        video: media,
-        mimetype: 'video/mp4',
-        caption: caption,
-        mentions: users
-      }, { quoted: m })
-    } else {
-      // TEXTO
-      await conn.sendMessage(m.chat, {
-        text: caption,
-        mentions: users
-      }, { quoted: m })
-    }
-  } catch (e) {
-    console.log(e)
-    m.reply('❌ Error al enviar el hidetag')
-  }
-}
-
-handler.help = ['hidetag [texto]', 'notify [texto]']
-handler.tags = ['grupos']
-handler.command = ['hidetag', 'notify', 'n', 'noti', 'notificar', 'notif', 'aviso', 'avisar']
-handler.group = true
+handler.help = ['hidetag', 'tag']
+handler.tags = ['grupo']
+handler.command = ['hidetag', 'tag', 'n']
 handler.admin = true
 
 export default handler
