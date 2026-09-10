@@ -60,7 +60,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
   if (fail) return
 
   // IMAGEN FIJA ANTITOP
-  let catalogoImg = { url: 'https://files.evogb.win/1FbQzR.jpg' }
+  let catalogoImg = { url: 'https://files.evogb.win/9zDB47.jpg' }
 
   let estadoTexto = isEnable? 'Activado 🫧' : 'Desactivado ✖️'
   let estadoEmoji = isEnable? '🟢' : '🔴'
