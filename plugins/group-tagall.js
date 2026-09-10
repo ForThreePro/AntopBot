@@ -80,7 +80,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 *Powered by*: ***Antitop Bot Oficial*** 🪼`
 
     // IMAGEN FIJA
-    const imageUrl = { url: 'https://files.evogb.win/1FbQzR.jpg' }
+    const imageUrl = { url: 'https://files.evogb.win/9zDB47.jpg' }
 
     await conn.sendMessage(m.chat, {
       image: imageUrl,
