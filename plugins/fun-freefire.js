@@ -1,323 +1,148 @@
-let handler = async (m, { conn, command }) => {
+let vs = global.vsData = global.vsData || {}
 
-let listas = {
-'vs16': `߳₊🪭⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _16 🇦🇷 ʾ 🇵🇪14_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🎐𐑞
-⌇🎐𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+const crear = async (m, { conn, args, usedPrefix, command }) => {
+    if (args.length < 2) return conn.reply(m.chat, `*❌ Ejemplo:* ${usedPrefix + command} 14 pe Apos`, m);
 
-'vs18': `߳₊🪭⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _18 🇦🇷 ʾ 🇵🇪16_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🎐𐑞
-⌇🎐𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    let horaRaw = args[0];
+    let hora, minutos;
+    if(horaRaw.includes(':')){ [hora, minutos] = horaRaw.split(':').map(Number) } else { hora = Number(horaRaw); minutos = 0 }
 
-'vs20': `߳₊🪭⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _20 🇦🇷 ʾ 🇵🇪18_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🎐𐑞
-⌇🎐𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    const pais = args[1].toUpperCase();
+    const diferenciasHorarias = { CL: 2, AR: 2, PE: 0, BO: 2 };
+    if (!(pais in diferenciasHorarias)) return conn.reply(m.chat, '*⚠️ Usa PE, CL, AR o BO*', m);
 
-'vs22': `߳₊🪭⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _22 🇦🇷 ʾ 🇵🇪20_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🎐𐑞
-⌇🎐𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    const diferenciaHoraria = diferenciasHorarias[pais];
+    const formatTime = (date) => date.toLocaleTimeString('es', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    const horasEnPais = { PE: '', CL: '', AR: '', BO: '' };
+    for (const key in diferenciasHorarias) {
+        const horaActual = new Date(); horaActual.setHours(hora, minutos, 0, 0);
+        const horaEnPais = new Date(horaActual.getTime() + (3600000 * (diferenciasHorarias[key] - diferenciaHoraria)));
+        horasEnPais[key] = formatTime(horaEnPais);
+    }
 
-'vs00': `߳₊🪭⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _00 🇦🇷 ʾ 🇵🇪22_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🎐𐑞
-⌇🎐𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    const modalidad = args.slice(2).join(' ') || 'APOS';
+    let groupName = 'VS TEAM'
+    if(m.isGroup){
+        let groupMeta = await conn.groupMetadata(m.chat)
+        groupName = groupMeta.subject.toUpperCase()
+    }
 
-'vs01': `߳₊🪭⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _01 🇦🇷 ʾ 🇵🇪23_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇🪭𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🎐𐑞
-⌇🎐𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    let cantidad = command.includes('6')? 6 : 4
+    let tipo = command.includes('fem')? 'FEM' : command.includes('masc')? 'MASC' : 'MIXTO'
 
-'vsfem16': `߳₊💅⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _16 🇦🇷 ʾ 🇵🇪14_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🌸𐑞
-⌇🌸𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    // DISEÑOS
+    let diseño = {}
+    if(tipo === 'FEM'){ // KAWAI
+        diseño = { header: `ㅤ ㅤㅤ ˗ˏˋ ꒰ ♡ ꒱ ˎˊ˗\n🩷⃝☁️🍭̊${groupName}.🍭🩷⃝☁️`, icon: '🍭', suplente: '🧁' }
+    }
+    if(tipo === 'MASC'){ // LUXURY
+        diseño = { header: `ㅤ👑˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗👑\n✧･ﾟ: *✧･ﾟ:* 🥂 *:･ﾟ✧*:･ﾟ✧`, icon: '🥥', suplente: '🥂' }
+    }
+    if(tipo === 'MIXTO'){ // GALAXY
+        diseño = { header: `.　☆\n　　★彡\n🌌⃟✨ ${groupName} ✨⃟🌌`, icon: '🍁', suplente: '☄️' }
+    }
 
-'vsfem18': `߳₊💅⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _18 🇦🇷 ʾ 🇵🇪16_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🌸𐑞
-⌇🌸𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    vs[m.chat] = vs[m.chat] || { salas: [], tipo, diseño, groupName }
+    if(vs[m.chat].tipo!== tipo) vs[m.chat] = { salas: [], tipo, diseño, groupName } // reinicia si cambia de tipo
 
-'vsfem20': `߳₊💅⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _20 🇦🇷 ʾ 🇵🇪18_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🌸𐑞
-⌇🌸𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
+    vs[m.chat].salas.push({
+        jugadores: [],
+        suplentes: [],
+        modalidad,
+        horasEnPais,
+        cantidad,
+        icons1: Array(cantidad).fill(diseño.icon),
+        icons2: [diseño.suplente, diseño.suplente]
+    })
 
-'vsfem22': `߳₊💅⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _22 🇦🇷 ʾ 🇵🇪20_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🌸𐑞
-⌇🌸𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsfem00': `߳₊💅⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _00 🇦🇷 ʾ 🇵🇪22_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🌸𐑞
-⌇🌸𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsfem01': `߳₊💅⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _01 🇦🇷 ʾ 🇵🇪23_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇💋𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇🌸𐑞
-⌇🌸𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsmasc16': `߳₊🔥⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _16 🇦🇷 ʾ 🇵🇪14_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇👑𐑞
-⌇👑𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇⚡𐑞
-⌇⚡𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsmasc18': `߳₊🔥⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _18 🇦🇷 ʾ 🇵🇪16_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇⚡𐑞
-⌇⚡𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsmasc20': `߳₊🔥⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _20 🇦🇷 ʾ 🇵🇪18_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇⚡𐑞
-⌇⚡𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsmasc22': `߳₊🔥⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _22 🇦🇷 ʾ 🇵🇪20_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇⚡𐑞
-⌇⚡𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsmasc00': `߳₊🔥⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _00 🇦🇷 ʾ 🇵🇪22_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇⚡𐑞
-⌇⚡𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``,
-
-'vsmasc01': `߳₊🔥⋆.˚ 𝟦𝑽𝑺4 𝑺𝑼𝑹 ꒱ ˖ׄ ୭
-╭ ꕀ ֹ
-⌇ ⸝⸝ 🆚 𖥦 ﹕
-⌇ ⸝⸝ ⏰ 𖥦 ﹕ _01 🇦🇷 ʾ 🇵🇪23_
-╰ ☆⃞ 　 ʾ 　 ๑
-╭ ꕀ ֹ
-⌇ ◟✦ 𓏼𝑻𝑰𝑻𝑼𝑳𝑨𝑹𝑬𝑺﹕
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇👑𐑞
-⌇ ◟✦ 𓏼𝑺𝑼𝑷𝑳𝑬𝑵𝑻𝑬𝑺﹕
-⌇⚡𐑞
-⌇⚡𐑞
-╰ ☆⃞ 　 ʾ 　 ๑
-\`｡⁖. 𝑷𝒖𝒏𝒕𝒖𝒂𝒍𝒊𝒅𝒂𝒅 | 𝑺𝒊𝒏 𝒍𝒂𝒈 | 𝑹𝒆𝒔𝒑𝒆𝒕𝒐 ⁖｡\``
+    await actualizarLista(m.chat, conn, usedPrefix)
+    m.react(diseño.icon)
 }
 
-let lista = listas[command]
-if (!lista) return m.reply('Comando no válido.\n\nMIxta:.vs16.vs18.vs20.vs22.vs00.vs01\nFEMENINA:.vsfem16.vsfem18.vsfem20.vsfem22.vsfem00.vsfem01\nMASCULINA:.vsmasc16.vsmasc18.vsmasc20.vsmasc22.vsmasc00.vsmasc01')
+const anotar = async (m, { conn, args, usedPrefix, command }) => {
+    if (!vs[m.chat] ||!vs[m.chat].salas.length) return conn.reply(m.chat, `*❌ No hay VS activa*`, m)
+    let salaNum = parseInt(args[0]) - 1
+    if(isNaN(salaNum)) salaNum = 0
 
-await conn.sendMessage(m.chat, { text: lista }, { quoted: m })
+    let sala = vs[m.chat].salas[salaNum]
+    if(!sala) return conn.reply(m.chat, `*❌ Sala ${args[0]} no existe*`, m)
+
+    let users = m.mentionedJid || []
+    if(users.length === 0) return conn.reply(m.chat, `*❌ Menciona a alguien*\nEj:.anotar 1 @pepito @juana`, m)
+
+    for(let user of users){
+        sala.jugadores = sala.jugadores.filter(v => v!== user)
+        sala.suplentes = sala.suplentes.filter(v => v!== user)
+
+        if (command === 'anotar') {
+            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `*⚠️ Sala ${salaNum+1} llena*`, m)
+            sala.jugadores.push(user)
+        }
+        if (command === 'suplente') {
+            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `*⚠️ Suplentes sala ${salaNum+1} llenos*`, m)
+            sala.suplentes.push(user)
+        }
+        if (command === 'salir') {
+            await conn.reply(m.chat, `❌ @${user.split('@')[0]} salió`, m, { mentions: [user] })
+        }
+    }
+    await actualizarLista(m.chat, conn, usedPrefix)
+}
+
+const actualizarLista = async (chat, conn, usedPrefix) => {
+    let data = vs[chat]
+    let d = data.diseño
+    let todasSalas = ''
+
+    data.salas.forEach((sala) => {
+        let listaJug = sala.jugadores.map((v) => `┆⋆${sala.icons1[0]} @${v.split('@')[0]}`).join('\n')
+        let listaSup = sala.suplentes.map((v) => `┆ ⋆${sala.icons2[0]} @${v.split('@')[0]}`).join('\n')
+
+        for(let j = sala.jugadores.length; j < sala.cantidad; j++){ listaJug += `\n┆⋆${sala.icons1[0]} ` }
+        for(let j = sala.suplentes.length; j < 2; j++){ listaSup += `\n┆ ⋆${sala.icons2[0]} ` }
+
+        todasSalas += `┆ *${sala.icons2[0]}MODO : ${sala.modalidad}${sala.icons2[0]}*\n`
+        todasSalas += `┆⋆.˚ּ ֶָ ${sala.horasEnPais.PE} 🇵🇪${sala.horasEnPais.CL}🇨🇱🇧🇴 ${sala.horasEnPais.AR}🇦🇷\n`
+        todasSalas += `┆⋆𝗥𝗶𝘃𝗮𝗹:\n${listaJug}\n`
+        todasSalas += `┆ *Suplentes:*\n${listaSup}\n`
+        todasSalas += `╰────────────⁀➴\n\n`
+    })
+
+    const message = `${d.header}\n\n${todasSalas}
+╭─「 COMO ANOTARSE 」
+│ Admin: *.anotar 1 @user1 @user2*
+│ Admin: *.suplente 2 @user*
+│ Admin: *.salir 1 @user*
+│
+│ Players:
+│ 😎 = Quiero JUGAR ❤️
+│ 🌸 = Quiero SUPLENTE 🤖
+╰───────────────────`;
+
+    let mentions = []
+    data.salas.forEach(s => mentions.push(...s.jugadores,...s.suplentes))
+    await conn.sendMessage(chat, { text: message, mentions })
+}
+
+const handler = async (m, { conn, args, usedPrefix, command }) => {
+    if (/^v[46](fem|masc|mixto)$/i.test(command)) return crear(m, {conn, args, usedPrefix, command})
+    if (['anotar','suplente','salir'].includes(command)) return anotar(m, {conn, args, usedPrefix, command})
 }
 
 handler.help = [
-'vs16 ( Lista Mixta Sur )','vs18 ( Lista Mixta Sur )','vs20 ( Lista Mixta Sur )','vs22 ( Lista Mixta Sur )','vs00 ( Lista Mixta Sur )','vs01 ( Lista Mixta Sur )',
-'vsfem16 ( Lista Femenina Sur )','vsfem18 ( Lista Femenina Sur )','vsfem20 ( Lista Femenina Sur )','vsfem22 ( Lista Femenina Sur )','vsfem00 ( Lista Femenina Sur )','vsfem01 ( Lista Femenina Sur )',
-'vsmasc16 ( Lista Masculina Sur )','vsmasc18 ( Lista Masculina Sur )','vsmasc20 ( Lista Masculina Sur )','vsmasc22 ( Lista Masculina Sur )','vsmasc00 ( Lista Masculina Sur )','vsmasc01 ( Lista Masculina Sur )'
+    'v4fem <hora> <pais> <modalidad>',
+    'v4masc <hora> <pais> <modalidad>',
+    'v4mixto <hora> <pais> <modalidad>',
+    'v6fem <hora> <pais> <modalidad>',
+    'v6masc <hora> <pais> <modalidad>',
+    'v6mixto <hora> <pais> <modalidad>',
+    'anotar <numSala> @user1 @user2',
+    'suplente <numSala> @user',
+    'salir <numSala> @user'
 ]
-handler.tags = ['ff']
-handler.command = /^(vs16|vs18|vs20|vs22|vs00|vs01|vsfem16|vsfem18|vsfem20|vsfem22|vsfem00|vsfem01|vsmasc16|vsmasc18|vsmasc20|vsmasc22|vsmasc00|vsmasc01)$/i
+handler.tags = ['freefire']
+handler.command = /^(v[46](fem|masc|mixto)|anotar|suplente|salir)$/i
+handler.group = true
+handler.admin = true // solo admin puede crear y anotar
 
 export default handler
