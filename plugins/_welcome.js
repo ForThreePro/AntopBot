@@ -32,7 +32,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
   if (!userJid) return!0
 
   // IMAGEN FIJA - Solo cambié la URL
-  const DEFAULT_IMG = 'https://files.evogb.win/1FbQzR.jpg'
+  const DEFAULT_IMG = 'https://files.evogb.win/9zDB47.jpg'
   let imgBuffer = null
 
   // PASO 1: Intentar obtener foto del usuario
